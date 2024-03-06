@@ -1,7 +1,9 @@
-What is lingua?
+What is lingva?
 ===============
 
-Lingua is a package with tools to extract translatable texts from
+This is a fork of package of https://github.com/wichert/lingua
+
+Lingva is a package with tools to extract translatable texts from
 your code, and to check existing translations. It replaces the use
 of the ``xgettext`` command from gettext, or ``pybabel`` from Babel.
 
@@ -22,13 +24,13 @@ This will create a ``messages.pot`` file containing all found messages.
 Specifying input files
 ----------------------
 
-There are three ways to tell lingua which files you want it to scan:
+There are three ways to tell lingva which files you want it to scan:
 
 1. Specify filenames directly on the command line. For example::
 
    $ pot-create main.py utils.py
 
-2. Specify a directory on the command line. Lingua will recursively scan that
+2. Specify a directory on the command line. lingva will recursively scan that
    directory for all files it knows how to handle.
 
    ::
@@ -55,10 +57,10 @@ directory::
 Configuration
 -------------
 
-In its default configuration lingua will use its python extractor for ``.py``
+In its default configuration lingva will use its python extractor for ``.py``
 files, its XML extractor for ``.pt`` and ``.zpt`` files and its ZCML extractor
 for ``.zcml`` files. If you use different extensions you setup a configuration
-file which tells lingua how to process files. This file uses a simple ini-style
+file which tells lingva how to process files. This file uses a simple ini-style
 format.
 
 There are two types of configuration that can be set in the configuration file:
@@ -67,7 +69,7 @@ extractor.
 
 File extensions are configured in the ``extensions`` section. Each entry in
 this section maps a file extension to an extractor name. For example to
-tell lingua to use its XML extractor for files with a ``.html`` extension
+tell lingva to use its XML extractor for files with a ``.html`` extension
 you can use this configuration::
 
     [extensions]
@@ -91,27 +93,27 @@ used for expressions is TALES instead of Python::
     [extractor:xml]
     default-engine = tales
 
-Either place a global configuration file named ``.config/lingua`` to your
-home folder or use the ``--config`` option to point lingua to your
+Either place a global configuration file named ``.config/lingva`` to your
+home folder or use the ``--config`` option to point lingva to your
 configuration file.
 
 ::
 
-    $ pot-create -c lingua.cfg src
+    $ pot-create -c lingva.cfg src
 
 
 Domain filtering
 ----------------
 
 When working with large systems you may use multiple translation domains
-in a single source tree. Lingua can support that by filtering messages by
+in a single source tree. lingva can support that by filtering messages by
 domain when scanning sources. To enable domain filtering use the ``-d`` option:
 
 ::
 
     $ pot-create -d mydomain src
 
-Lingua will always include messages for which it can not determine the domain.
+lingva will always include messages for which it can not determine the domain.
 For example, take this Python code:
 
 ::
@@ -122,7 +124,7 @@ For example, take this Python code:
 The first hello-message does not specify its domain and will always be
 included. The second line uses `dgettext
 <http://docs.python.org/2/library/gettext#gettext.dgettext>`_ to explicitly
-specify the domain. Lingua will use this information when filtering domains.
+specify the domain. lingva will use this information when filtering domains.
 
 
 Including comments
@@ -146,7 +148,7 @@ Comments are inherited, so you can put them on a parent element as well.
    </form>
 
 
-For Python code you can tell lingua to include comments by using the
+For Python code you can tell lingva to include comments by using the
 ``--add-comments`` option. This will make Linua include all comments on the
 line(s) *immediately preceeding* (there may be no empty line in between) a
 translation call.
@@ -177,7 +179,7 @@ Setting message flags in comments
 
 Messages can have *flags*. These are to indicate what format a message has, and
 are typically used by validation tools to check if a translation does not break
-variable references or template syntax. Lingua does a reasonable job to detect
+variable references or template syntax. lingva does a reasonable job to detect
 strings using C and Python formatting, but sometimes you may need to set flags
 yourself. This can be done with a ``[flag, flag]`` marker in a comment.
 
@@ -191,7 +193,7 @@ yourself. This can be done with a ``[flag, flag]`` marker in a comment.
 Specifying keywords
 -------------------
 
-When looking for messages a lingua parser uses a default list of keywords
+When looking for messages a lingva parser uses a default list of keywords
 to identify translation calls. You can add extra keywords via the ``--keyword``
 option. If you have your own ``mygettext`` function which takes a string
 to translate as its first parameter you can use this:
@@ -200,7 +202,7 @@ to translate as its first parameter you can use this:
 
     $ pot-create --keyword=mygettext
 
-If your function takes more parameters you will need to tell lingua about them.
+If your function takes more parameters you will need to tell lingva about them.
 This can be done in several ways:
 
 * If the translatable text is not the first parameter you can specify the
@@ -216,7 +218,7 @@ This can be done in several ways:
 * If your function takes the domain as a parameter you can specify which parameter
   is used for the domain by adding a ``d`` to the parameter number. For example
   the keyword specifier for ``dgettext`` is ``dgettext:1d,2``. This is a
-  lingua-specified extension.
+  lingva-specified extension.
 * You can specify the exact number of parameters a function call must have
   using the ``t`` postfix. For example if a function *must* have four parameters
   to be a valid call, the specifier could be ``myfunc:1,4t``.
@@ -225,7 +227,7 @@ This can be done in several ways:
 Extractors
 ==========
 
-Lingua includes a number of extractors:
+lingva includes a number of extractors:
 
 * `python`: handles Python source code.
 * `chameleon`: handles `Chameleon <http://www.pagetemplates.org/>`_ files,
@@ -243,13 +245,13 @@ Babel extractors
 ----------------
 
 There are several packages with plugins for `Babel
-<http://babel.edgewall.org/>`_'s message extraction tool. Lingua can use those
+<http://babel.edgewall.org/>`_'s message extraction tool. lingva can use those
 plugins as well. The plugin names will be prefixed with ``babel-`` to
-distinguish them from lingua extractors.
+distinguish them from lingva extractors.
 
 For example, if you have the `PyBabel-json
 <https://pypi.python.org/pypi/PyBabel-json>`_ package installed you can
-instruct lingua to use it for .json files by adding this to your configuration
+instruct lingva to use it for .json files by adding this to your configuration
 file::
 
      [extensions]
@@ -274,7 +276,7 @@ Differences compared to `GNU gettext <https://www.gnu.org/software/gettext/>`_:
   `Chameleon`_,
   `Plone <http://plone.org/>`_ and `Zope <http://www.zope.org>`_).
 * Better support for detecting format strings used in Python.
-* No direct support for C, C++, Perl, and many other languages. Lingua focuses
+* No direct support for C, C++, Perl, and many other languages. lingva focuses
   on languages commonly used in Python projects, although support for other
   languages can be added via plugins.
 
@@ -282,7 +284,7 @@ Differences compared to `GNU gettext <https://www.gnu.org/software/gettext/>`_:
 Differences compared to `Babel`_:
 
 * More reliable detection of Python format strings.
-* Lingua includes plural support.
+* lingva includes plural support.
 * Support for only extracting texts for a given translation domain. This is
   often useful for extensible software where you use multiple translation
   domains in a single application.
@@ -291,7 +293,7 @@ Differences compared to `Babel`_:
 Validating translations
 =======================
 
-Lingua includes a simple ``polint`` tool which performs a few basic checks on
+lingva includes a simple ``polint`` tool which performs a few basic checks on
 PO files. Currently implemented tests are:
 
 * duplicated message ids (can also be checked with GNU gettext's ``msgfmt``).
@@ -318,8 +320,8 @@ Writing custom extractors
 
 First we need to create the custom extractor::
 
-    from lingua.extractors import Extractor
-    from lingua.extractors import Message
+    from lingva.extractors import Extractor
+    from lingva.extractors import Message
 
     class MyExtractor(Extractor):
         '''One-line description for --list-extractors'''
@@ -328,17 +330,17 @@ First we need to create the custom extractor::
         def __call__(self, filename, options):
             return [Message(None, 'msgid', None, [], u'', u'', (filename, 1))]
 
-Hooking up extractors to lingua is done by ``lingua.extractors`` entry points
+Hooking up extractors to lingva is done by ``lingva.extractors`` entry points
 in ``setup.py``::
 
     setup(name='mypackage',
           ...
           install_requires=[
-              'lingua',
+              'lingva',
           ],
           ...
           entry_points='''
-          [lingua.extractors]
+          [lingva.extractors]
           my_extractor = mypackage.extractor:MyExtractor
           '''
           ...)
@@ -346,7 +348,7 @@ in ``setup.py``::
 Note - the registered extractor must be a class derived from the ``Extractor``
 base class.
 
-After installing ``mypackage`` lingua will automatically detect the new custom
+After installing ``mypackage`` lingva will automatically detect the new custom
 extractor.
 
 

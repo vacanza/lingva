@@ -5,7 +5,7 @@ except ImportError:
     import mock
 import pytest
 import io
-from lingua.extractors.python import PythonExtractor
+from lingva.extractors.python import PythonExtractor
 
 
 python_extractor = PythonExtractor()
@@ -15,7 +15,7 @@ source = None
 @pytest.fixture
 def fake_source(request):
     patcher = mock.patch(
-        "lingua.extractors.python._open", side_effect=lambda *a: io.StringIO(source)
+        "lingva.extractors.python._open", side_effect=lambda *a: io.StringIO(source)
     )
     patcher.start()
     request.addfinalizer(patcher.stop)
@@ -250,7 +250,7 @@ def test_bytes_input():
     options = mock.Mock()
     options.keywords = []
     with mock.patch(
-        "lingua.extractors.python._open", side_effect=lambda *a: io.BytesIO(input)
+        "lingva.extractors.python._open", side_effect=lambda *a: io.BytesIO(input)
     ):
         messages = list(python_extractor("filename", options))
         assert len(messages) == 1

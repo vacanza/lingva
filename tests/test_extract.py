@@ -1,8 +1,8 @@
 import polib
-from lingua.extract import POEntry
-from lingua.extract import POFile
-from lingua.extract import identical
-from lingua.extract import strip_linenumbers
+from lingva.extract import POEntry
+from lingva.extract import POFile
+from lingva.extract import identical
+from lingva.extract import strip_linenumbers
 
 
 STRIPPED_LINENUMBERS_PO = """\

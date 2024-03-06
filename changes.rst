@@ -1,6 +1,11 @@
 Changelog
 =========
 
+5.0
+------------------------
+- Fork lingua as lingva. 
+- Bump version to 5.0.
+
 4.??
 ------------------------
 

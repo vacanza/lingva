@@ -162,7 +162,7 @@ class Extractor(object):
 
 
 def register_extractors():
-    for entry_point in working_set.iter_entry_points("lingua.extractors"):
+    for entry_point in working_set.iter_entry_points("lingva.extractors"):
         try:
             extractor = entry_point.load(require=True)
         except DistributionNotFound:

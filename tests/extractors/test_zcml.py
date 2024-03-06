@@ -4,7 +4,7 @@ except ImportError:
     import mock
 import pytest
 from io import BytesIO
-from lingua.extractors.zcml import ZCMLExtractor
+from lingva.extractors.zcml import ZCMLExtractor
 
 
 zcml_extractor = ZCMLExtractor()
@@ -23,7 +23,7 @@ def _options(**kw):
 @pytest.fixture
 def fake_source(request):
     patcher = mock.patch(
-        "lingua.extractors.zcml._open", side_effect=lambda *a: BytesIO(source)
+        "lingva.extractors.zcml._open", side_effect=lambda *a: BytesIO(source)
     )
     patcher.start()
     request.addfinalizer(patcher.stop)
@@ -51,7 +51,7 @@ def test_i18n_without_domain():
 def test_i18n_with_domain():
     global source
     source = b"""\
-                <configure i18n_domain="lingua">
+                <configure i18n_domain="lingva">
                   <dummy title="test title"/>
                 </configure>
               """
@@ -64,7 +64,7 @@ def test_i18n_with_domain():
 def test_multiple_messages():
     global source
     source = b"""\
-                <configure i18n_domain="lingua">
+                <configure i18n_domain="lingva">
                   <dummy title="test title 1"/>
                   <dummy title="test title 2"/>
                 </configure>
@@ -80,7 +80,7 @@ def test_domain_nesting():
     global source
     source = b"""\
                 <configure>
-                  <configure i18n_domain="lingua">
+                  <configure i18n_domain="lingva">
                       <dummy title="test title 1"/>
                   </configure>
                   <dummy title="test title 2"/>

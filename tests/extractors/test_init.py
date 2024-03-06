@@ -1,6 +1,6 @@
-from lingua.extractors import check_c_format
-from lingua.extractors import Keyword
-from lingua.extractors import Extractor
+from lingva.extractors import check_c_format
+from lingva.extractors import Keyword
+from lingva.extractors import Extractor
 import pytest
 
 

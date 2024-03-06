@@ -17,12 +17,12 @@ except ImportError:
     from ConfigParser import SafeConfigParser
 import click
 import polib
-from lingua.extractors import get_extractor
-from lingua.extractors import register_extractors
-from lingua.extractors.babel import register_babel_plugins
-from lingua.extractors import EXTRACTORS
-from lingua.extractors import EXTENSIONS
-from lingua import __version__
+from lingva.extractors import get_extractor
+from lingva.extractors import register_extractors
+from lingva.extractors.babel import register_babel_plugins
+from lingva.extractors import EXTRACTORS
+from lingva.extractors import EXTENSIONS
+from lingva import __version__
 
 
 def po_timestamp():
@@ -170,7 +170,7 @@ def create_catalog(
     catalog.metadata["MIME-Version"] = "1.0"
     catalog.metadata["Content-Type"] = "text/plain; charset=UTF-8"
     catalog.metadata["Content-Transfer-Encoding"] = "8bit"
-    catalog.metadata["Generated-By"] = "Lingua %s" % __version__
+    catalog.metadata["Generated-By"] = "Lingva %s" % __version__
     return catalog
 
 
@@ -399,7 +399,7 @@ def main(
         read_config(cfg_file)
     else:
         user_home = os.path.expanduser("~")
-        global_config = os.path.join(user_home, ".config", "lingua")
+        global_config = os.path.join(user_home, ".config", "lingva")
         if os.path.exists(global_config):
             read_config(open(global_config, "r"))
 

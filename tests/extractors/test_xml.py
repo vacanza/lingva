@@ -5,8 +5,8 @@ except ImportError:
     import mock
 import pytest
 from io import BytesIO
-from lingua.extractors.xml import ChameleonExtractor
-from lingua.extractors.xml import get_python_expressions
+from lingva.extractors.xml import ChameleonExtractor
+from lingva.extractors.xml import get_python_expressions
 
 
 xml_extractor = ChameleonExtractor()
@@ -25,7 +25,7 @@ def _options(**kw):
 @pytest.fixture
 def fake_source(request):
     patcher = mock.patch(
-        "lingua.extractors.xml._open", side_effect=lambda *a: BytesIO(source)
+        "lingva.extractors.xml._open", side_effect=lambda *a: BytesIO(source)
     )
     patcher.start()
     request.addfinalizer(patcher.stop)
@@ -50,7 +50,7 @@ def test_empty_xml():
 def test_attributes_plain():
     global source
     source = u"""<html xmlns:i18n="http://xml.zope.org/namespaces/i18n"
-                      i18n:domain="lingua">
+                      i18n:domain="lingva">
                   <dummy i18n:attributes="title" title="tést title"/>
                 </html>
                 """.encode(
@@ -68,7 +68,7 @@ def test_custom_i18n_namespace():
     source = b"""<html i18n:domain="other">
                    <dummy i18n:translate="">Foo</dummy>
                    <other xmlns:i="http://xml.zope.org/namespaces/i18n"
-                          i:domain="lingua">
+                          i:domain="lingva">
                      <dummy i:translate="">Foo</dummy>
                    </other>
                    <dummy i18n:translate="">Foo</dummy>
@@ -85,7 +85,7 @@ def test_custom_i18n_namespace():
 def test_attributes_explicit_MessageId():
     global source
     source = u"""<html xmlns:i18n="http://xml.zope.org/namespaces/i18n"
-                       i18n:domain="lingua">
+                       i18n:domain="lingva">
                    <dummy i18n:attributes="title msg_title" title="test tïtle"/>
                  </html>
                   """.encode(
@@ -113,7 +113,7 @@ def test_attributes_no_domain_without_domain_filter():
 def test_attributes_multiple_attributes():
     global source
     source = u"""<html xmlns:i18n="http://xml.zope.org/namespaces/i18n"
-                       i18n:domain="lingua">
+                       i18n:domain="lingva">
                    <dummy i18n:attributes="title ; alt" title="tést title"
                           alt="test ålt"/>
                  </html>""".encode(
@@ -129,7 +129,7 @@ def test_attributes_multiple_attributes():
 def test_attributes_multiple_attributes_explicit_msgid():
     global source
     source = u"""<html xmlns:i18n="http://xml.zope.org/namespaces/i18n"
-                      i18n:domain="lingua">
+                      i18n:domain="lingva">
                   <dummy i18n:attributes="title msg_title; alt msg_alt"
                          title="test titlé" alt="test ålt"/>
                 </html>""".encode(
@@ -149,7 +149,7 @@ def test_translate_minimal():
     global source
     source = u"""\
                 <html xmlns:i18n="http://xml.zope.org/namespaces/i18n"
-                      i18n:domain="lingua">
+                      i18n:domain="lingva">
                   <dummy i18n:translate="">Dummy téxt</dummy>
                 </html>""".encode(
         "utf-8"
@@ -165,7 +165,7 @@ def test_translate_explicit_msgid():
     global source
     source = u"""\
                 <html xmlns:i18n="http://xml.zope.org/namespaces/i18n"
-                      i18n:domain="lingua">
+                      i18n:domain="lingva">
                   <dummy i18n:translate="msgid_dummy">Dummy téxt</dummy>
                 </html>""".encode(
         "utf-8"
@@ -182,7 +182,7 @@ def test_translate_subelement():
     global source
     source = u"""\
                 <html xmlns:i18n="http://xml.zope.org/namespaces/i18n"
-                      i18n:domain="lingua">
+                      i18n:domain="lingva">
                   <dummy i18n:translate="msgid_dummy">Dummy
                     <strong>text</strong> demø</dummy>
                 </html>
@@ -201,7 +201,7 @@ def test_translate_named_subelement():
     global source
     source = u"""\
                 <html xmlns:i18n="http://xml.zope.org/namespaces/i18n"
-                      i18n:domain="lingua">
+                      i18n:domain="lingva">
                   <dummy i18n:translate="msgid_dummy">Dummy
                     <strong i18n:name="text">téxt</strong> demø</dummy>
                 </html>
@@ -220,7 +220,7 @@ def test_translate_translated_subelement():
     global source
     source = u"""\
                 <html xmlns:i18n="http://xml.zope.org/namespaces/i18n"
-                      i18n:domain="lingua">
+                      i18n:domain="lingva">
                   <dummy i18n:translate="">Dummy
                     <strong i18n:name="text"
                             i18n:translate="">téxt</strong>
@@ -244,7 +244,7 @@ def test_translate_translated_subelement_with_id():
     global source
     source = u"""\
                 <html xmlns:i18n="http://xml.zope.org/namespaces/i18n"
-                      i18n:domain="lingua">
+                      i18n:domain="lingva">
                   <dummy i18n:translate="msgid_dummy">Dummy
                     <strong i18n:name="text"
                             i18n:translate="msgid_text">téxt</strong>
@@ -273,7 +273,7 @@ def test_strip_extra_whitespace():
     global source
     source = b"""\
                 <html xmlns:i18n="http://xml.zope.org/namespaces/i18n"
-                      i18n:domain="lingua">
+                      i18n:domain="lingva">
                   <dummy i18n:translate="">Dummy
 
 
@@ -290,7 +290,7 @@ def test_strip_trailing_and_leading_whitespace():
     global source
     source = b"""\
                 <html xmlns:i18n="http://xml.zope.org/namespaces/i18n"
-                      i18n:domain="lingua">
+                      i18n:domain="lingva">
                   <dummy i18n:translate="">
                     Dummy text
                   </dummy>
@@ -305,7 +305,7 @@ def test_html_entities():
     global source
     source = b"""\
                 <html xmlns:i18n="http://xml.zope.org/namespaces/i18n"
-                      i18n:domain="lingua">
+                      i18n:domain="lingva">
                   <button i18n:translate="">Lock &amp; load&nbsp;</button>
                 </html>
                 """
@@ -319,7 +319,7 @@ def test_ignore_undeclared_namespace():
     source = b"""\
                 <html xmlns="http://www.w3.org/1999/xhtml"
                       xmlns:i18n="http://xml.zope.org/namespaces/i18n"
-                      i18n:domain="lingua">
+                      i18n:domain="lingva">
                   <tal:block/>
                   <p i18n:translate="">Test</p>
                 </html>
@@ -334,7 +334,7 @@ def test_ignore_dynamic_message():
     source = b"""\
                 <html xmlns="http://www.w3.org/1999/xhtml"
                       xmlns:i18n="http://xml.zope.org/namespaces/i18n"
-                      i18n:domain="lingua">
+                      i18n:domain="lingva">
                   <p i18n:translate="">${'dummy'}</p>
                 </html>
                 """
@@ -346,7 +346,7 @@ def test_translate_call_in_python_expression_attribute():
     global source
     source = b"""\
                 <html xmlns:i18n="http://xml.zope.org/namespaces/i18n"
-                      i18n:domain="lingua">
+                      i18n:domain="lingva">
                   <dummy tal:replace="_(u'foo')">Dummy</dummy>
                 </html>
                 """
@@ -359,7 +359,7 @@ def test_translate_call_in_python_expression_repeat_attribute():
     global source
     source = b"""\
                 <html xmlns:i18n="http://xml.zope.org/namespaces/i18n"
-                      i18n:domain="lingua">
+                      i18n:domain="lingva">
                   <dummy tal:repeat="label _(u'foo')">${label}</dummy>
                 </html>
                 """
@@ -372,7 +372,7 @@ def test_translate_call_in_python_expression_in_char_data():
     global source
     source = b"""\
                 <html xmlns:i18n="http://xml.zope.org/namespaces/i18n"
-                      i18n:domain="lingua">
+                      i18n:domain="lingva">
                   <dummy>${_(u'foo')}</dummy>
                 </html>
                 """
@@ -385,7 +385,7 @@ def test_translate_call_in_python_expression_in_attribute():
     global source
     source = b"""\
                 <html xmlns:i18n="http://xml.zope.org/namespaces/i18n"
-                      i18n:domain="lingua">
+                      i18n:domain="lingva">
                   <dummy title="${_(u'foo')}"></dummy>
                 </html>
                 """
@@ -398,7 +398,7 @@ def test_multiple_expressions_with_translate_calls():
     global source
     source = b"""\
                 <html xmlns:i18n="http://xml.zope.org/namespaces/i18n"
-                      i18n:domain="lingua">
+                      i18n:domain="lingva">
                   <dummy title="${_(u'foo')} ${_(u'bar')}"></dummy>
                 </html>
                 """
@@ -412,7 +412,7 @@ def test_translate_multiple_defines():
     global source
     source = b"""\
                 <html xmlns:i18n="http://xml.zope.org/namespaces/i18n"
-                      i18n:domain="lingua">
+                      i18n:domain="lingva">
                   <tal:analytics define="isAnon _('one'); account _('two')">
                   </tal:analytics>
                 </html>
@@ -428,7 +428,7 @@ def test_translate_explicit_python_expression_engine():
     global source
     source = b"""\
                 <html xmlns:i18n="http://xml.zope.org/namespaces/i18n"
-                      i18n:domain="lingua">
+                      i18n:domain="lingva">
                   <tal:analytics define="layout python:_('one'); account _('two')">
                   </tal:analytics>
                 </html>
@@ -444,7 +444,7 @@ def test_translate_ignore_other_expression_engine():
     global source
     source = b"""\
                 <html xmlns:i18n="http://xml.zope.org/namespaces/i18n"
-                      i18n:domain="lingua">
+                      i18n:domain="lingva">
                   <tal:analytics define="layout load:layout.pt; account _('two')">
                   </tal:analytics>
                 </html>
@@ -459,7 +459,7 @@ def test_translate_ignore_other_expression_engine_with_numbers():
     global source
     source = b"""\
                 <html xmlns:i18n="http://xml.zope.org/namespaces/i18n"
-                      i18n:domain="lingua">
+                      i18n:domain="lingva">
                   <tal:analytics define="layout i18n:context.title; account _('two')">
                   </tal:analytics>
                 </html>
@@ -474,7 +474,7 @@ def test_translate_ignore_other_content_expression_engine_with_structure():
     global source
     source = b"""\
                 <html xmlns:i18n="http://xml.zope.org/namespaces/i18n"
-                      i18n:domain="lingua">
+                      i18n:domain="lingva">
                   <tal:var content="structure provider:my.content.provider">
                   </tal:var>
                 </html>
@@ -488,7 +488,7 @@ def test_translate_explicit_python_engine_with_structure():
     global source
     source = b"""\
                 <html xmlns:i18n="http://xml.zope.org/namespaces/i18n"
-                      i18n:domain="lingua">
+                      i18n:domain="lingva">
                   <tal:var content="structure python:_('foo')">
                   </tal:var>
                 </html>
@@ -503,7 +503,7 @@ def test_translate_entities_in_python_expression():
     global source
     source = b"""\
                 <html xmlns:i18n="http://xml.zope.org/namespaces/i18n"
-                      i18n:domain="lingua">
+                      i18n:domain="lingva">
                   <div class="${' disabled' if 1 &lt; 2 else None}"/>
                 </html>
                 """
@@ -569,7 +569,7 @@ def test_python_expression_in_tales_expressions():
     global source
     source = u"""
                 <html xmlns:i18n="http://xml.zope.org/namespaces/i18n"
-                      i18n:domain="lingua">
+                      i18n:domain="lingva">
                   <dummy tal:define="css_class css_class|string:${field.widget.css_class};">Dummy</dummy>
                 </html>
                 """.encode(
@@ -583,7 +583,7 @@ def test_ignore_structure_in_replace():
     global source
     source = u"""\
                 <html xmlns:i18n="http://xml.zope.org/namespaces/i18n"
-                      i18n:domain="lingua">
+                      i18n:domain="lingva">
                   <dummy tal:replace="structure _(u'føo')">Dummy</dummy>
                 </html>
                 """.encode(
@@ -598,7 +598,7 @@ def test_repeat_multiple_assignment():
     global source
     source = u"""\
                 <html xmlns:i18n="http://xml.zope.org/namespaces/i18n"
-                      i18n:domain="lingua">
+                      i18n:domain="lingva">
                   <dummy tal:repeat="(ix, item) [(1, _(u'føo'))]">Dummy</dummy>
                 </html>
                 """.encode(
@@ -613,7 +613,7 @@ def test_carriage_return_in_define():
     global source
     source = u"""\
                 <html xmlns:i18n="http://xml.zope.org/namespaces/i18n"
-                      i18n:domain="lingua">
+                      i18n:domain="lingva">
                   <dummy tal:define="foo True or
                                      _(u'føo')">Dummy</dummy>
                 </html>
@@ -629,7 +629,7 @@ def test_multiline_replace():
     global source
     source = u"""\
                 <html xmlns:i18n="http://xml.zope.org/namespaces/i18n"
-                      i18n:domain="lingua">
+                      i18n:domain="lingva">
                   <dummy tal:replace="True or
                                       _(u'føo')">Dummy</dummy>
                 </html>
@@ -645,7 +645,7 @@ def test_multiline_replace_with_structure():
     global source
     source = u"""\
                 <html xmlns:i18n="http://xml.zope.org/namespaces/i18n"
-                      i18n:domain="lingua">
+                      i18n:domain="lingva">
                   <dummy tal:replace="structure True or
                                       _(u'føo')">Dummy</dummy>
                 </html>
@@ -661,7 +661,7 @@ def test_spaces_around_tal_pipe_symbol():
     global source
     source = u"""\
                 <html xmlns:i18n="http://xml.zope.org/namespaces/i18n"
-                      i18n:domain="lingua">
+                      i18n:domain="lingva">
                   <div tal:repeat="choice values | field.widget.values"/>
                 </html>
                 """.encode(
@@ -675,7 +675,7 @@ def test_empty_element():
     global source
     source = u"""\
                 <html xmlns:i18n="http://xml.zope.org/namespaces/i18n"
-                      i18n:domain="lingua">
+                      i18n:domain="lingva">
                   <img title="message" i18n:attributes="title">
                   <p></p>
                 </html>
@@ -691,7 +691,7 @@ def test_brace_in_python_expression():
     global source
     source = u"""\
                 <html xmlns:i18n="http://xml.zope.org/namespaces/i18n"
-                      i18n:domain="lingua">
+                      i18n:domain="lingva">
                   <p>${some_method(_('abc'), {'a':'b'})}</p>
                 </html>
                 """.encode(
@@ -706,7 +706,7 @@ def test_brace_in_python_expression():
 def test_translation_context():
     global source
     source = u"""<html xmlns:i18n="http://xml.zope.org/namespaces/i18n"
-                      i18n:domain="lingua">
+                      i18n:domain="lingva">
                   <button i18n:context="form" i18n:translate="">Save</button>
                 </html>
                 """.encode(
@@ -721,7 +721,7 @@ def test_translation_context():
 def test_translation_comment():
     global source
     source = u"""<html xmlns:i18n="http://xml.zope.org/namespaces/i18n"
-                      i18n:domain="lingua">
+                      i18n:domain="lingva">
                   <button i18n:comment="Generic save button" i18n:translate="">Save</button>
                 </html>
                 """.encode(
@@ -736,7 +736,7 @@ def test_translation_comment():
 def test_translation_comment_for_attribute():
     global source
     source = u"""<html xmlns:i18n="http://xml.zope.org/namespaces/i18n"
-                      i18n:domain="lingua">
+                      i18n:domain="lingva">
                   <input i18n:comment="Placeholder text" i18n:attributes="placeholder" placeholder="Email address">
                 </html>
                 """.encode(
@@ -751,7 +751,7 @@ def test_translation_comment_for_attribute():
 def test_translation_comment_and_msgid():
     global source
     source = u"""<html xmlns:i18n="http://xml.zope.org/namespaces/i18n"
-                      i18n:domain="lingua">
+                      i18n:domain="lingva">
                   <button i18n:comment="Generic save button" i18n:translate="btn_save">Save</button>
                 </html>
                 """.encode(
@@ -766,7 +766,7 @@ def test_translation_comment_and_msgid():
 def test_inherit_translation_comment():
     global source
     source = u"""<html xmlns:i18n="http://xml.zope.org/namespaces/i18n"
-                      i18n:domain="lingua">
+                      i18n:domain="lingva">
                   <div i18n:comment="Form buttons">
                     <button i18n:translate="">Save</button>
                   </div>
@@ -784,7 +784,7 @@ def test_linenumbers():
     global source
     source = u"""<!DOCTYPE html>
                  <html xmlns:i18n="http://xml.zope.org/namespaces/i18n"
-                      i18n:domain="lingua">
+                      i18n:domain="lingva">
                   <span />
                   <span
                     />
@@ -820,7 +820,7 @@ def test_linenumbers():
                 -->
                 <tal:macros
                     xmlns:i18n="http://xml.zope.org/namespaces/i18n"
-                    i18n:domain="lingua">
+                    i18n:domain="lingva">
                         <!--
                             comment
                         -->
@@ -844,7 +844,7 @@ def test_domain_filter():
     global source
     source = u"""\
                 <html xmlns:i18n="http://xml.zope.org/namespaces/i18n"
-                      i18n:domain="lingua">
+                      i18n:domain="lingva">
                   <dummy i18n:translate="">Dummy téxt</dummy>
                 </html>""".encode(
         "utf-8"
@@ -858,7 +858,7 @@ def test_domain_filter_for_attribute():
     global source
     source = u"""\
                 <html xmlns:i18n="http://xml.zope.org/namespaces/i18n"
-                      i18n:domain="lingua">
+                      i18n:domain="lingva">
                   <dummy title="Dummy text" i18n:attributes="title"></dummy>
                 </html>""".encode(
         "utf-8"
@@ -872,7 +872,7 @@ def test_domain_filter_for_expression():
     global source
     source = u"""\
                 <html xmlns:i18n="http://xml.zope.org/namespaces/i18n"
-                      i18n:domain="lingua">
+                      i18n:domain="lingva">
                   <dummy>${_(u'foo')}</dummy>
                 </html>""".encode(
         "utf-8"
@@ -886,7 +886,7 @@ def test_context_for_attributes():
     global source
     source = u"""\
                 <html xmlns:i18n="http://xml.zope.org/namespaces/i18n"
-                      i18n:domain="lingua">
+                      i18n:domain="lingva">
                   <span title="message" i18n:context="figure" i18n:attributes="title"></span>
                 </html>
                 """.encode(
