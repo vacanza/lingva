@@ -1,6 +1,7 @@
 from __future__ import print_function
-from pkg_resources import DistributionNotFound
-from pkg_resources import working_set
+
+from importlib.metadata import entry_points
+
 import abc
 import collections
 import os
@@ -162,13 +163,8 @@ class Extractor(object):
 
 
 def register_extractors():
-    for entry_point in working_set.iter_entry_points("lingva.extractors"):
-        try:
-            extractor = entry_point.load(require=True)
-        except DistributionNotFound:
-            # skip this entry point since at least one required dependency can
-            # not be found
-            extractor = None
+    for entry_point in entry_points("lingua.extractors"):
+        extractor = entry_point.load()
         if extractor:
             if not issubclass(extractor, Extractor):
                 raise ValueError("Registered extractor must derive from ``Extractor``")
