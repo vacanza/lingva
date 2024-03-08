@@ -239,6 +239,7 @@ def save_catalog(catalog, filename):
         if old_catalog is not None and identical(catalog, old_catalog):
             click.echo("No changes found - not replacing %s" % filename)
             return
+        os.unlink(filename)
     (fd, tmpfile) = tempfile.mkstemp(dir=os.path.dirname(filename), text=True)
     output = io.open(fd, "wt", encoding=catalog.encoding)
     output.write(catalog.__unicode__())
