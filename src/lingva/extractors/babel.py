@@ -58,7 +58,7 @@ class BabelExtractor(Extractor):
 
 
 def register_babel_plugins():
-    for entry_point in entry_points("babel.extractors"):
+    for entry_point in entry_points(group="babel.extractors"):
         extractor = entry_point.load()
         if extractor:
             name = entry_point.name

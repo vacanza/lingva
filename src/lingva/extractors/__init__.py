@@ -163,7 +163,7 @@ class Extractor(object):
 
 
 def register_extractors():
-    for entry_point in entry_points("lingua.extractors"):
+    for entry_point in entry_points(group="lingva.extractors"):
         extractor = entry_point.load()
         if extractor:
             if not issubclass(extractor, Extractor):
