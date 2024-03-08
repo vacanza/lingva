@@ -1,7 +1,7 @@
 What is lingva?
 ===============
 
-This is a fork of package of https://github.com/wichert/lingua
+**This is a fork of https://github.com/wichert/lingua**
 
 Lingva is a package with tools to extract translatable texts from
 your code, and to check existing translations. It replaces the use

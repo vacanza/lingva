@@ -11,10 +11,7 @@ import sys
 import tempfile
 import time
 
-try:
-    from configparser import SafeConfigParser
-except ImportError:
-    from ConfigParser import SafeConfigParser
+from configparser import ConfigParser as SafeConfigParser
 import click
 import polib
 from lingva.extractors import get_extractor
