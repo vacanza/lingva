@@ -13,6 +13,7 @@
 /.project
 /.pydevproject
 /.settings/
+*.code-workspace
 *.pyo
 *.pyc
 *.egg
