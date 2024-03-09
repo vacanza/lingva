@@ -28,13 +28,10 @@ jobs:
 
       - name: Install
         run: |
-          python -m venv .
-          source bin/activate
-          pip install flit
-          flit install --extras dev
+          python -m pip install .[dev]
 
       - name: Run tests
-        run: bin/pytest -v
+        run: python -m pytest -v
 
   publish:
     name: Publish to PyPI
@@ -54,17 +51,10 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Insert version number
-        run: |
-          version=$(echo $GITHUB_REF | sed -e 's#refs/tags/v##')
-          sed -i -Ee "/__version/s/[0-9.]+/$version/" src/lingva/__init__.py
-
       - name: Build wheel
         run: |
-          python -m venv .venv
-          source .venv/bin/activate
-          pip install flit
-          flit build
+          python -m pip install build
+          python -m build
 
       - name: Publish to PyPI
         uses: pypa/gh-action-pypi-publish@release/v1
