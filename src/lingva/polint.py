@@ -1,6 +1,7 @@
-import click
 import collections
 import textwrap
+
+import click
 import polib
 
 
@@ -21,35 +22,29 @@ def verify_po(path, show_path):
         if entry.msgstr:
             reverse_map[entry.msgstr].append(key)
 
-    for (key, count) in msgids.items():
+    for key, count in msgids.items():
         if count == 1:
             continue
         click.echo("%sMessage repeated %d times:" % (leader, count))
         (context, msgid) = key
         if context:
             msgid = "[%s] %s" % (context, msgid)
-        click.echo(
-            textwrap.fill(msgid, initial_indent=" " * 5, subsequent_indent=" " * 8)
-        )
+        click.echo(textwrap.fill(msgid, initial_indent=" " * 5, subsequent_indent=" " * 8))
         click.echo()
 
-    for (msgstr, keys) in reverse_map.items():
+    for msgstr, keys in reverse_map.items():
         if len(keys) == 1:
             continue
 
         click.echo("%sTranslation:" % leader)
-        click.echo(
-            textwrap.fill(msgstr, initial_indent=" " * 8, subsequent_indent=" " * 8)
-        )
+        click.echo(textwrap.fill(msgstr, initial_indent=" " * 8, subsequent_indent=" " * 8))
         click.echo("Used for %d canonical texts:" % len(keys))
-        for (idx, info) in enumerate(keys):
+        for idx, info in enumerate(keys):
             (context, msgid) = info
             if context:
                 msgid = "[%s] %s" % (context, msgid)
             click.echo(
-                textwrap.fill(
-                    msgid, initial_indent="%-8d" % (idx + 1), subsequent_indent=8 * " "
-                )
+                textwrap.fill(msgid, initial_indent="%-8d" % (idx + 1), subsequent_indent=8 * " ")
             )
         click.echo()
 

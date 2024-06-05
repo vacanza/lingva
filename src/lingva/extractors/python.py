@@ -1,17 +1,20 @@
 from __future__ import print_function
+
 import ast
 import io
 import sys
 import tokenize
 import warnings
-from . import Extractor
-from . import Message
-from . import check_comment_flags
-from . import check_c_format
-from . import check_python_format
-from . import Keyword
-from . import update_keywords
 
+from . import (
+    Extractor,
+    Keyword,
+    Message,
+    check_c_format,
+    check_comment_flags,
+    check_python_format,
+    update_keywords,
+)
 
 try:
     basestring
@@ -84,7 +87,7 @@ def parse_translationstring(arguments, filename, firstline):
         msgid = args[0]
     if len(args) > 2 and isinstance(args[2], basestring):
         default = args[2]
-    for (key, value) in kwargs.items():
+    for key, value in kwargs.items():
         if not isinstance(value, basestring):
             continue
         if key == "msgid":
@@ -184,7 +187,7 @@ class PythonParser(object):
         self.messages = []
         self.handler = self.state_skip
         try:
-            for (token_type, token, location, _) in token_stream:
+            for token_type, token, location, _ in token_stream:
                 self.process_token(token_type, token, location, token_stream)
         except tokenize.TokenError as e:
             print(
@@ -223,9 +226,7 @@ class PythonParser(object):
             if self.include_comments == "tagged":
                 comment = comment[len(self.comment_marker) :].strip()
             (flags, comment) = check_comment_flags(comment)
-            if self.messages and self.messages[-1].location[1] == (
-                self.firstline + location[0]
-            ):
+            if self.messages and self.messages[-1].location[1] == (self.firstline + location[0]):
                 last_message = self.messages[-1]
                 # Comment at the end of the line of a keyword call
                 new_comment = []
@@ -341,7 +342,7 @@ class PythonParser(object):
 
     def skip_iterable(self, start_token, end_token, token_stream):
         depth = 1
-        for (token_type, token, loc, _) in token_stream:
+        for token_type, token, loc, _ in token_stream:
             if token_type == tokenize.OP:
                 if token == start_token:
                     depth += 1
@@ -356,9 +357,7 @@ class PythonParser(object):
 
     def process_keyword(self):
         if self.keyword is not None:
-            msg = parse_keyword(
-                self.arguments, self.keyword, self.filename, self.firstline
-            )
+            msg = parse_keyword(self.arguments, self.keyword, self.filename, self.firstline)
         else:
             msg = parse_translationstring(self.arguments, self.filename, self.firstline)
         if msg is None:

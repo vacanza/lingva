@@ -1,5 +1,5 @@
-from __future__ import absolute_import
-from __future__ import print_function
+from __future__ import absolute_import, print_function
+
 import ast
 import collections
 
@@ -7,19 +7,19 @@ try:
     from collections import OrderedDict
 except ImportError:
     from ordereddict import OrderedDict
+
 import re
 import sys
-from chameleon.namespaces import I18N_NS
-from chameleon.namespaces import TAL_NS
+
+from chameleon.namespaces import I18N_NS, TAL_NS
 from chameleon.program import ElementProgram
-from chameleon.zpt.program import MacroProgram
 from chameleon.tal import parse_defines
 from chameleon.tales import split_parts
 from chameleon.utils import decode_htmlentities
+from chameleon.zpt.program import MacroProgram
 
+from . import Extractor, Message
 from .python import _extract_python
-from . import Extractor
-from . import Message
 
 
 def _open(filename):
@@ -84,10 +84,8 @@ class TranslateContext(object):
             comments.append(self.comment)
         if text:
             comments.append("Default: %s" % text)
-        for (name, context) in self.children.items():
-            comments.append(
-                'Canonical text for ${%s} is: "%s"' % (name, context.full_text())
-            )
+        for name, context in self.children.items():
+            comments.append('Canonical text for ${%s} is: "%s"' % (name, context.full_text()))
         if self.parent:
             comments.append('Used in sentence: "%s"' % self.parent.full_text())
         return Message(
@@ -107,12 +105,10 @@ def get_newline_count(s):
 
 
 def get_plain_attrs(attrs):
-    plain_attrs = dict()
+    plain_attrs = {}
     offset = 0
     for attr in attrs:
-        offset += get_newline_count(
-            attr["space"] + attr["name"] + attr["eq"] + attr["quote"]
-        )
+        offset += get_newline_count(attr["space"] + attr["name"] + attr["eq"] + attr["quote"])
         post_offset = offset + get_newline_count(attr["value"] + attr["quote"])
         plain_attrs[attr["name"].split(":")[-1]] = (attr["value"], offset, post_offset)
         offset = post_offset
@@ -153,9 +149,7 @@ class ChameleonExtractor(Extractor, ElementProgram):
                 file=sys.stderr,
             )
             sys.exit(1)
-        return [
-            m.message() if isinstance(m, TranslateContext) else m for m in self.messages
-        ]
+        return [m.message() if isinstance(m, TranslateContext) else m for m in self.messages]
 
     def visit(self, kind, args):
         visitor = getattr(self, "visit_%s" % kind, None)
@@ -201,9 +195,7 @@ class ChameleonExtractor(Extractor, ElementProgram):
             self.domainstack.append(self.domainstack[-1])
 
         current_domain = self.domainstack[-1][0]
-        include_domain = (
-            self.target_domain is None or self.target_domain == current_domain
-        )
+        include_domain = self.target_domain is None or self.target_domain == current_domain
 
         i18n_translate = attributes.get((I18N_NS, "translate"))
         if i18n_translate is not None:
@@ -253,7 +245,7 @@ class ChameleonExtractor(Extractor, ElementProgram):
                             offset=offset,
                         )
 
-            for (attribute, value) in attributes.items():
+            for attribute, value in attributes.items():
                 value = decode_htmlentities(value)
                 for source in self.get_code_for_attribute(attribute, value):
                     self.parse_python(source)
@@ -338,7 +330,7 @@ class ChameleonExtractor(Extractor, ElementProgram):
         default_engine = self.config["default-engine"]
         if attribute[0] == TAL_NS:
             if attribute[1] in ["content", "replace"]:
-                for (engine, value) in split_expression(value, default_engine):
+                for engine, value in split_expression(value, default_engine):
                     if engine == "python":
                         m = STRUCTURE_PREFIX.match(value)
                         if m is not None:
@@ -352,8 +344,8 @@ class ChameleonExtractor(Extractor, ElementProgram):
                             self._assert_valid_python(value)
                             yield value
             if attribute[1] == "define":
-                for (scope, var, value) in parse_defines(value):
-                    for (engine, value) in split_expression(value, default_engine):
+                for scope, var, value in parse_defines(value):
+                    for engine, value in split_expression(value, default_engine):
                         if engine == "python":
                             value = "(%s)" % value
                             self._assert_valid_python(value)
@@ -366,7 +358,7 @@ class ChameleonExtractor(Extractor, ElementProgram):
                         % (self.filename, self.linenumber, value)
                     )
                 scope, var, value = defines[0]
-                for (engine, value) in split_expression(value, default_engine):
+                for engine, value in split_expression(value, default_engine):
                     if engine == "python":
                         self._assert_valid_python(value)
                         yield value
@@ -383,13 +375,11 @@ class ChameleonExtractor(Extractor, ElementProgram):
 
     def parse_python(self, source):
         assert isinstance(source, type(""))
-        for message in _extract_python(
-            self.filename, source, self.options, self.linenumber
-        ):
+        for message in _extract_python(self.filename, source, self.options, self.linenumber):
             self.messages.append(
                 Message(
                     *message[:6],
-                    location=(self.filename, self.linenumber + message.location[1])
+                    location=(self.filename, self.linenumber + message.location[1]),
                 )
             )
 
