@@ -1,14 +1,13 @@
 from __future__ import print_function
 
-from importlib.metadata import entry_points
-
 import abc
 import collections
 import os
 import re
 import sys
-from .compat import add_metaclass
+from importlib.metadata import entry_points
 
+from .compat import add_metaclass
 
 Message = collections.namedtuple(
     "Message", "msgctxt msgid msgid_plural flags comment tcomment location"

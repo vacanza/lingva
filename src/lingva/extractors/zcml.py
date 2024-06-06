@@ -1,10 +1,10 @@
-from __future__ import absolute_import
-from __future__ import print_function
+from __future__ import absolute_import, print_function
+
 import collections
 import sys
 from xml.parsers import expat
-from . import Extractor
-from . import Message
+
+from . import Extractor, Message
 
 
 def _open(filename):
@@ -31,9 +31,7 @@ class ZCMLExtractor(Extractor):
         try:
             self.parser.ParseFile(fileobj)
         except expat.ExpatError as e:
-            print(
-                "Aborting due to parse error in %s: %s" % (filename, e), file=sys.stderr
-            )
+            print("Aborting due to parse error in %s: %s" % (filename, e), file=sys.stderr)
             sys.exit(1)
         return self.messages
 
@@ -60,7 +58,7 @@ class ZCMLExtractor(Extractor):
             return
 
         if self.target_domain in [None, self.domainstack[-1]]:
-            for (key, value) in attributes.items():
+            for key, value in attributes.items():
                 if key in self.ATTRIBUTES:
                     self.add_message(value)
 

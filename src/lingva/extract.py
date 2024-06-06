@@ -4,22 +4,21 @@ try:
     from collections import OrderedDict
 except ImportError:
     from ordereddict import OrderedDict
-from operator import attrgetter
+
 import os
 import re
 import sys
 import tempfile
 import time
-
 from configparser import ConfigParser as SafeConfigParser
+from operator import attrgetter
+
 import click
 import polib
-from lingva.extractors import get_extractor
-from lingva.extractors import register_extractors
-from lingva.extractors.babel import register_babel_plugins
-from lingva.extractors import EXTRACTORS
-from lingva.extractors import EXTENSIONS
+
 from lingva import __version__
+from lingva.extractors import EXTENSIONS, EXTRACTORS, get_extractor, register_extractors
+from lingva.extractors.babel import register_babel_plugins
 
 
 def po_timestamp():
@@ -116,7 +115,7 @@ def list_files(files_from, sources):
         if os.path.isfile(file):
             yield file
         elif os.path.isdir(file):
-            for (dirpath, dirnames, filenames) in os.walk(file):
+            for dirpath, dirnames, filenames in os.walk(file):
                 for file in filenames:
                     if get_extractor(file) is not None:
                         yield os.path.join(dirpath, file)
@@ -146,9 +145,7 @@ def strip_linenumbers(entry):
     entry.occurrences = occurrences
 
 
-def create_catalog(
-    width, copyright_holder, package_name, package_version, msgid_bugs_address
-):
+def create_catalog(width, copyright_holder, package_name, package_version, msgid_bugs_address):
     catalog = POFile(wrapwidth=width)
     catalog.copyright_holder = copyright_holder
     catalog.package_name = package_name
@@ -174,8 +171,7 @@ def create_catalog(
 def _register_extension(extension, extractor):
     if extractor not in EXTRACTORS:
         click.echo(
-            "Unknown extractor %s. Check --list-extractors for available options"
-            % extractor,
+            "Unknown extractor %s. Check --list-extractors for available options" % extractor,
             err=True,
         )
         sys.exit(1)
@@ -187,7 +183,7 @@ def read_config(cfg_file):
     config.read_file(cfg_file)
     for section in config.sections():
         if section == "extensions":
-            for (extension, extractor) in config.items(section):
+            for extension, extractor in config.items(section):
                 _register_extension(extension, extractor)
         elif section.startswith("extractor:"):
             extractor = section[10:]
@@ -202,8 +198,7 @@ def read_config(cfg_file):
             EXTRACTORS[extractor].update_config(**extractor_config)
         elif section.startswith("extension"):
             click.echo(
-                "Use of %s section is obsolete. "
-                'Please use the "extensions" section.' % section,
+                "Use of %s section is obsolete. " 'Please use the "extensions" section.' % section,
                 err=True,
             )
             extension = section[10:]
@@ -286,9 +281,7 @@ class ExtractorOptions:
     help="Add DIRECTORY to list of paths to check for input files",
 )
 @click.argument("sources", nargs=-1, type=click.Path(exists=True))
-@click.option(
-    "--list-extractors", is_flag=True, help="List all known extraction plugins"
-)
+@click.option("--list-extractors", is_flag=True, help="List all known extraction plugins")
 # Output options
 @click.option(
     "-o",
@@ -359,9 +352,7 @@ class ExtractorOptions:
     default="1.0",
     help="Package version to use in the generated POT file",
 )
-@click.option(
-    "--msgid-bugs-address", metavar="EMAIL", help="Email address bugs should be send to"
-)
+@click.option("--msgid-bugs-address", metavar="EMAIL", help="Email address bugs should be send to")
 def main(
     cfg_file,
     files_from,

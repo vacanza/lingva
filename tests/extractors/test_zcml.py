@@ -2,10 +2,12 @@ try:
     from unittest import mock
 except ImportError:
     import mock
-import pytest
-from io import BytesIO
-from lingva.extractors.zcml import ZCMLExtractor
 
+from io import BytesIO
+
+import pytest
+
+from lingva.extractors.zcml import ZCMLExtractor
 
 zcml_extractor = ZCMLExtractor()
 source = None
@@ -15,16 +17,14 @@ def _options(**kw):
     options = mock.Mock()
     options.domain = None
     options.keywords = []
-    for (k, w) in kw.items():
+    for k, w in kw.items():
         setattr(options, k, w)
     return options
 
 
 @pytest.fixture
 def fake_source(request):
-    patcher = mock.patch(
-        "lingva.extractors.zcml._open", side_effect=lambda *a: BytesIO(source)
-    )
+    patcher = mock.patch("lingva.extractors.zcml._open", side_effect=lambda *a: BytesIO(source))
     patcher.start()
     request.addfinalizer(patcher.stop)
 
@@ -57,7 +57,7 @@ def test_i18n_with_domain():
               """
     messages = list(zcml_extractor("filename", _options()))
     assert len(messages) == 1
-    assert messages[0].msgid == u"test title"
+    assert messages[0].msgid == "test title"
 
 
 @pytest.mark.usefixtures("fake_source")
@@ -71,8 +71,8 @@ def test_multiple_messages():
               """
     messages = list(zcml_extractor("filename", _options()))
     assert len(messages) == 2
-    assert messages[0].msgid == u"test title 1"
-    assert messages[1].msgid == u"test title 2"
+    assert messages[0].msgid == "test title 1"
+    assert messages[1].msgid == "test title 2"
 
 
 @pytest.mark.usefixtures("fake_source")
@@ -88,7 +88,7 @@ def test_domain_nesting():
               """
     messages = list(zcml_extractor("filename", _options()))
     assert len(messages) == 1
-    assert messages[0].msgid == u"test title 1"
+    assert messages[0].msgid == "test title 1"
 
 
 @pytest.mark.usefixtures("fake_source")

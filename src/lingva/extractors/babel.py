@@ -1,13 +1,7 @@
 from importlib.metadata import entry_points
 
-from .python import KEYWORDS
-from .python import parse_keyword
-from . import EXTRACTORS
-from . import Message
-from . import check_c_format
-from . import check_python_format
-from . import Extractor
-from . import update_keywords
+from . import EXTRACTORS, Extractor, Message, check_c_format, check_python_format, update_keywords
+from .python import KEYWORDS, parse_keyword
 
 
 class BabelExtractor(Extractor):
@@ -23,10 +17,8 @@ class BabelExtractor(Extractor):
         if fileobj is None:
             fileobj = open(filename, "rb")
         comment_tags = self.config["comment-tags"].split()
-        messages = self.extractor(
-            fileobj, list(self.keywords.keys()), comment_tags, self.config
-        )
-        for (lineno, function, args, comment) in messages:
+        messages = self.extractor(fileobj, list(self.keywords.keys()), comment_tags, self.config)
+        for lineno, function, args, comment in messages:
             if not isinstance(args, (list, tuple)):
                 args = [args]
             if function in self.keywords:

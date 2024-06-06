@@ -1,7 +1,6 @@
-from lingva.extractors import check_c_format
-from lingva.extractors import Keyword
-from lingva.extractors import Extractor
 import pytest
+
+from lingva.extractors import Extractor, Keyword, check_c_format
 
 
 def test_no_format():
