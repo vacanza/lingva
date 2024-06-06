@@ -3,6 +3,7 @@ try:
     from unittest import mock
 except ImportError:
     import mock
+import warnings
 import pytest
 import io
 from lingva.extractors.python import PythonExtractor
@@ -252,6 +253,12 @@ def test_bytes_input():
     with mock.patch(
         "lingva.extractors.python._open", side_effect=lambda *a: io.BytesIO(input)
     ):
-        messages = list(python_extractor("filename", options))
+        with warnings.catch_warnings(record=True) as ctx:
+            messages = list(python_extractor("filename", options))
+
+        assert (
+            str(ctx[0].message) == "Python extractor called with bytes input. "
+            "Please update your plugin to submit unicode instead."
+        )
         assert len(messages) == 1
         assert messages[0].msgid == "word"

@@ -163,7 +163,12 @@ class Extractor(object):
 
 
 def register_extractors():
-    for entry_point in entry_points(group="lingva.extractors"):
+    try:
+        extractor_entry_points = entry_points(group="lingva.extractors")
+    except TypeError:  # <= Python 3.9
+        extractor_entry_points = entry_points()["lingva.extractors"]
+
+    for entry_point in extractor_entry_points:
         extractor = entry_point.load()
         if extractor:
             if not issubclass(extractor, Extractor):

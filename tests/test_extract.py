@@ -1,8 +1,11 @@
 import polib
+from lingva.extract import EXTENSIONS
 from lingva.extract import POEntry
 from lingva.extract import POFile
 from lingva.extract import identical
+from lingva.extract import read_config
 from lingva.extract import strip_linenumbers
+from lingva.extractors import register_extractors
 
 
 STRIPPED_LINENUMBERS_PO = """\
@@ -67,3 +70,10 @@ class Test_identical:
         for entry in a:
             strip_linenumbers(entry)
         assert identical(a, b)
+
+    def test_read_config(self):
+        assert ".html" not in EXTENSIONS
+
+        register_extractors()
+        read_config(open("tests/data/test_config.cfg"))
+        assert EXTENSIONS[".html"] == "xml"
