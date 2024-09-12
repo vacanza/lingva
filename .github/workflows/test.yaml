@@ -6,22 +6,31 @@ on:
 
 jobs:
   test:
-    name: Run tests
-    runs-on: ubuntu-latest
-
+    name: Test Python ${{ matrix.python-version }} on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        python: ["3.8", "3.9", "3.10", "3.11", "3.12"]
-
+        os:
+          - macos-latest
+          - ubuntu-latest
+          - windows-latest
+        python-version:
+          - '3.8'
+          - '3.9'
+          - '3.10'
+          - '3.11'
+          - '3.12'
+          - '3.13'
     steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
+      - name: Check out repository
+        uses: actions/checkout@v4
 
-      - name: Set up Python ${{ matrix.python }}
+      - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v5
         with:
-          python-version: ${{ matrix.python }}
+          allow-prereleases: true
+          check-latest: true
+          python-version: ${{ matrix.python-version }}
 
       - name: flake8
         uses: py-actions/flake8@v2
@@ -49,6 +58,7 @@ jobs:
       - name: Set up Python 3.12
         uses: actions/setup-python@v5
         with:
+          check-latest: true
           python-version: "3.12"
 
       - name: Build wheel
