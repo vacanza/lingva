@@ -157,8 +157,8 @@ class ChameleonExtractor(Extractor, ElementProgram):
             return visitor(*args)
         else:
             print(
-                "Warning: Unknown node type '%s' in %s, linenumbers might be off. Please report this warning."
-                % (kind, self.filename),
+                "Warning: Unknown node type '%s' in %s, linenumbers might be off. "
+                "Please report this warning." % (kind, self.filename),
                 file=sys.stderr,
             )
 
