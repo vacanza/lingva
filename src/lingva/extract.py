@@ -151,16 +151,15 @@ def create_catalog(width, copyright_holder, package_name, package_version, msgid
     catalog.package_name = package_name
     catalog.metadata_is_fuzzy = True
     catalog.metadata = OrderedDict()
-    catalog.metadata["Project-Id-Version"] = " ".join(
-        filter(None, [package_name, package_version])
-    )
+    catalog.metadata["Project-Id-Version"] = f"{package_name} {package_version}"
     if msgid_bugs_address:
         catalog.metadata["Report-Msgid-Bugs-To"] = msgid_bugs_address
-    catalog.metadata["POT-Creation-Date"] = po_timestamp()
-    catalog.metadata["PO-Revision-Date"] = "YEAR-MO-DA HO:MI+ZONE"
+    po_time = po_timestamp()
+    catalog.metadata["POT-Creation-Date"] = po_time
+    catalog.metadata["PO-Revision-Date"] = po_time
     catalog.metadata["Last-Translator"] = "FULL NAME <EMAIL@ADDRESS>"
     catalog.metadata["Language-Team"] = "LANGUAGE <LL@li.org>"
-    catalog.metadata["Language"] = ""
+    catalog.metadata["Language"] = "LANGUAGE"
     catalog.metadata["MIME-Version"] = "1.0"
     catalog.metadata["Content-Type"] = "text/plain; charset=UTF-8"
     catalog.metadata["Content-Transfer-Encoding"] = "8bit"
@@ -253,6 +252,95 @@ class ExtractorOptions:
         self.comment_tag = comment_tag
         self.domain = domain
         self.keywords = keywords
+
+
+def extract(
+    cfg_file=None,
+    files_from=None,
+    directory=None,
+    sources=None,
+    list_extractors=None,
+    output="messages.pot",
+    location=True,
+    linenumbers=True,
+    width=79,
+    sort_order=None,
+    domain=None,
+    keywords=None,
+    comment_tag=None,
+    copyright_holder=None,
+    package_name="PACKAGE",
+    package_version="1.0",
+    msgid_bugs_address=None,
+):
+    """Extract translatable strings."""
+    directory = list(directory)
+    register_extractors()
+    register_babel_plugins()
+
+    if comment_tag is None:
+        comment_tag = True
+    if list_extractors:
+        for extractor in sorted(EXTRACTORS):
+            click.echo("%-17s %s" % (extractor, EXTRACTORS[extractor].__doc__ or ""))
+        return
+
+    if cfg_file:
+        read_config(cfg_file)
+    else:
+        user_home = os.path.expanduser("~")
+        global_config = os.path.join(user_home, ".config", "lingva")
+        if os.path.exists(global_config):
+            read_config(open(global_config, "r"))
+
+    catalog = create_catalog(
+        width, copyright_holder, package_name, package_version, msgid_bugs_address
+    )
+
+    scanned = 0
+    for filename in no_duplicates(list_files(files_from, sources)):
+        real_filename = find_file(filename, directory)
+        if real_filename is None:
+            click.echo("Can not find file %s" % filename, err=True)
+            sys.exit(1)
+        extractor = get_extractor(real_filename)
+        if extractor is None:
+            click.echo("No extractor available for file %s" % filename, err=True)
+            sys.exit(1)
+
+        extractor_options = ExtractorOptions(
+            comment_tag=comment_tag,
+            domain=domain,
+            keywords=keywords,
+        )
+        for message in extractor(real_filename, extractor_options):
+            entry = catalog.find(message.msgid, msgctxt=message.msgctxt)
+            if entry is None:
+                entry = POEntry(msgctxt=message.msgctxt, msgid=message.msgid)
+                if message.msgid_plural:
+                    entry.msgid_plural = message.msgid_plural
+                    entry.msgstr_plural[0] = ""
+                    entry.msgstr_plural[1] = ""
+                catalog.append(entry)
+            entry.update(message, add_occurrences=location)
+        scanned += 1
+    if not scanned:
+        click.echo("No files scanned, aborting", err=True)
+        sys.exit(1)
+    if not catalog:
+        click.echo("No translatable strings found, aborting", err=True)
+        sys.exit(2)
+
+    if sort_order == "msgid":
+        catalog.sort(key=attrgetter("msgid"))
+    elif sort_order == "location":
+        catalog.sort(key=_location_sort_key)
+
+    if not linenumbers:
+        for entry in catalog:
+            strip_linenumbers(entry)
+
+    save_catalog(catalog, output)
 
 
 @click.command()
@@ -372,74 +460,26 @@ def main(
     package_version,
     msgid_bugs_address,
 ):
-    "Extract translatable strings."
-    directory = list(directory)
-    register_extractors()
-    register_babel_plugins()
-
-    if comment_tag is None:
-        comment_tag = True
-    if list_extractors:
-        for extractor in sorted(EXTRACTORS):
-            click.echo("%-17s %s" % (extractor, EXTRACTORS[extractor].__doc__ or ""))
-        return
-
-    if cfg_file:
-        read_config(cfg_file)
-    else:
-        user_home = os.path.expanduser("~")
-        global_config = os.path.join(user_home, ".config", "lingva")
-        if os.path.exists(global_config):
-            read_config(open(global_config, "r"))
-
-    catalog = create_catalog(
-        width, copyright_holder, package_name, package_version, msgid_bugs_address
+    """Main entrypoint."""
+    extract(
+        cfg_file,
+        files_from,
+        directory,
+        sources,
+        list_extractors,
+        output,
+        location,
+        linenumbers,
+        width,
+        sort_order,
+        domain,
+        keywords,
+        comment_tag,
+        copyright_holder,
+        package_name,
+        package_version,
+        msgid_bugs_address,
     )
-
-    scanned = 0
-    for filename in no_duplicates(list_files(files_from, sources)):
-        real_filename = find_file(filename, directory)
-        if real_filename is None:
-            click.echo("Can not find file %s" % filename, err=True)
-            sys.exit(1)
-        extractor = get_extractor(real_filename)
-        if extractor is None:
-            click.echo("No extractor available for file %s" % filename, err=True)
-            sys.exit(1)
-
-        extractor_options = ExtractorOptions(
-            comment_tag=comment_tag,
-            domain=domain,
-            keywords=keywords,
-        )
-        for message in extractor(real_filename, extractor_options):
-            entry = catalog.find(message.msgid, msgctxt=message.msgctxt)
-            if entry is None:
-                entry = POEntry(msgctxt=message.msgctxt, msgid=message.msgid)
-                if message.msgid_plural:
-                    entry.msgid_plural = message.msgid_plural
-                    entry.msgstr_plural[0] = ""
-                    entry.msgstr_plural[1] = ""
-                catalog.append(entry)
-            entry.update(message, add_occurrences=location)
-        scanned += 1
-    if not scanned:
-        click.echo("No files scanned, aborting", err=True)
-        sys.exit(1)
-    if not catalog:
-        click.echo("No translatable strings found, aborting", err=True)
-        sys.exit(2)
-
-    if sort_order == "msgid":
-        catalog.sort(key=attrgetter("msgid"))
-    elif sort_order == "location":
-        catalog.sort(key=_location_sort_key)
-
-    if not linenumbers:
-        for entry in catalog:
-            strip_linenumbers(entry)
-
-    save_catalog(catalog, output)
 
 
 if __name__ == "__main__":
