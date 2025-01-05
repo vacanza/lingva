@@ -168,7 +168,10 @@ def register_extractors():
         extractor_entry_points = entry_points()["lingva.extractors"]
 
     for entry_point in extractor_entry_points:
-        extractor = entry_point.load()
+        try:
+            extractor = entry_point.load()
+        except ModuleNotFoundError:
+            extractor = None
         if extractor:
             if not issubclass(extractor, Extractor):
                 raise ValueError("Registered extractor must derive from ``Extractor``")

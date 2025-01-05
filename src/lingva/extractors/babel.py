@@ -56,7 +56,10 @@ def register_babel_plugins():
         babel_entry_points = entry_points()["babel.extractors"]
 
     for entry_point in babel_entry_points:
-        extractor = entry_point.load()
+        try:
+            extractor = entry_point.load()
+        except ModuleNotFoundError:
+            extractor = None
         if extractor:
             name = entry_point.name
             cls = type(
