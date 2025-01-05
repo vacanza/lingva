@@ -151,7 +151,9 @@ def create_catalog(width, copyright_holder, package_name, package_version, msgid
     catalog.package_name = package_name
     catalog.metadata_is_fuzzy = True
     catalog.metadata = OrderedDict()
-    catalog.metadata["Project-Id-Version"] = f"{package_name} {package_version}"
+    catalog.metadata["Project-Id-Version"] = " ".join(
+        filter(None, [package_name, package_version])
+    )
     if msgid_bugs_address:
         catalog.metadata["Report-Msgid-Bugs-To"] = msgid_bugs_address
     po_time = po_timestamp()
