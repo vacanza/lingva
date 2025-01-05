@@ -539,12 +539,14 @@ class Test_get_python_expression(object):
 @pytest.mark.usefixtures("fake_source")
 def test_python_expression_in_tales_expressions():
     global source
-    source = """
+    source = b"""\
                 <html xmlns:i18n="http://xml.zope.org/namespaces/i18n"
                       i18n:domain="lingva">
-                  <dummy tal:define="css_class css_class|string:${field.widget.css_class};">Dummy</dummy>
+                  <dummy tal:define="css_class css_class|string:${field.widget.css_class};">
+                    Dummy
+                  </dummy>
                 </html>
-                """.encode("utf-8")
+                """
     assert list(xml_extractor("filename", _options())) == []
 
 
@@ -619,25 +621,25 @@ def test_multiline_replace_with_structure():
 @pytest.mark.usefixtures("fake_source")
 def test_spaces_around_tal_pipe_symbol():
     global source
-    source = """\
+    source = b"""\
                 <html xmlns:i18n="http://xml.zope.org/namespaces/i18n"
                       i18n:domain="lingva">
                   <div tal:repeat="choice values | field.widget.values"/>
                 </html>
-                """.encode("utf-8")
+                """
     list(xml_extractor("filename", _options()))
 
 
 @pytest.mark.usefixtures("fake_source")
 def test_empty_element():
     global source
-    source = """\
+    source = b"""\
                 <html xmlns:i18n="http://xml.zope.org/namespaces/i18n"
                       i18n:domain="lingva">
                   <img title="message" i18n:attributes="title">
                   <p></p>
                 </html>
-                """.encode("utf-8")
+                """
     messages = list(xml_extractor("filename", _options()))
     assert len(messages) == 1
 
@@ -645,12 +647,12 @@ def test_empty_element():
 @pytest.mark.usefixtures("fake_source")
 def test_brace_in_python_expression():
     global source
-    source = """\
+    source = b"""\
                 <html xmlns:i18n="http://xml.zope.org/namespaces/i18n"
                       i18n:domain="lingva">
                   <p>${some_method(_('abc'), {'a':'b'})}</p>
                 </html>
-                """.encode("utf-8")
+                """
     messages = list(xml_extractor("filename", _options()))
     assert len(messages) == 1
     assert messages[0].msgid == "abc"
@@ -659,11 +661,11 @@ def test_brace_in_python_expression():
 @pytest.mark.usefixtures("fake_source")
 def test_translation_context():
     global source
-    source = """<html xmlns:i18n="http://xml.zope.org/namespaces/i18n"
+    source = b"""<html xmlns:i18n="http://xml.zope.org/namespaces/i18n"
                       i18n:domain="lingva">
                   <button i18n:context="form" i18n:translate="">Save</button>
                 </html>
-                """.encode("utf-8")
+                """
     messages = list(xml_extractor("filename", _options()))
     assert messages[0].msgid == "Save"
     assert messages[0].msgctxt == "form"
@@ -672,11 +674,11 @@ def test_translation_context():
 @pytest.mark.usefixtures("fake_source")
 def test_translation_comment():
     global source
-    source = """<html xmlns:i18n="http://xml.zope.org/namespaces/i18n"
+    source = b"""<html xmlns:i18n="http://xml.zope.org/namespaces/i18n"
                       i18n:domain="lingva">
                   <button i18n:comment="Generic save button" i18n:translate="">Save</button>
                 </html>
-                """.encode("utf-8")
+                """
     messages = list(xml_extractor("filename", _options()))
     assert messages[0].msgid == "Save"
     assert messages[0].comment == "Generic save button"
@@ -685,11 +687,13 @@ def test_translation_comment():
 @pytest.mark.usefixtures("fake_source")
 def test_translation_comment_for_attribute():
     global source
-    source = """<html xmlns:i18n="http://xml.zope.org/namespaces/i18n"
+    source = b"""<html xmlns:i18n="http://xml.zope.org/namespaces/i18n"
                       i18n:domain="lingva">
-                  <input i18n:comment="Placeholder text" i18n:attributes="placeholder" placeholder="Email address">
+                  <input i18n:comment="Placeholder text"
+                      i18n:attributes="placeholder"
+                      placeholder="Email address">
                 </html>
-                """.encode("utf-8")
+                """
     messages = list(xml_extractor("filename", _options()))
     assert messages[0].msgid == "Email address"
     assert messages[0].comment == "Placeholder text"
@@ -698,11 +702,14 @@ def test_translation_comment_for_attribute():
 @pytest.mark.usefixtures("fake_source")
 def test_translation_comment_and_msgid():
     global source
-    source = """<html xmlns:i18n="http://xml.zope.org/namespaces/i18n"
+    source = b"""<html xmlns:i18n="http://xml.zope.org/namespaces/i18n"
                       i18n:domain="lingva">
-                  <button i18n:comment="Generic save button" i18n:translate="btn_save">Save</button>
+                  <button i18n:comment="Generic save button"
+                      i18n:translate="btn_save">
+                      Save
+                  </button>
                 </html>
-                """.encode("utf-8")
+                """
     messages = list(xml_extractor("filename", _options()))
     assert messages[0].msgid == "btn_save"
     assert messages[0].comment == "Generic save button\nDefault: Save"
@@ -711,13 +718,13 @@ def test_translation_comment_and_msgid():
 @pytest.mark.usefixtures("fake_source")
 def test_inherit_translation_comment():
     global source
-    source = """<html xmlns:i18n="http://xml.zope.org/namespaces/i18n"
+    source = b"""<html xmlns:i18n="http://xml.zope.org/namespaces/i18n"
                       i18n:domain="lingva">
                   <div i18n:comment="Form buttons">
                     <button i18n:translate="">Save</button>
                   </div>
                 </html>
-                """.encode("utf-8")
+                """
     messages = list(xml_extractor("filename", _options()))
     assert messages[0].msgid == "Save"
     assert messages[0].comment == "Form buttons"
@@ -726,7 +733,7 @@ def test_inherit_translation_comment():
 @pytest.mark.usefixtures("fake_source")
 def test_linenumbers():
     global source
-    source = """<!DOCTYPE html>
+    source = b"""<!DOCTYPE html>
                  <html xmlns:i18n="http://xml.zope.org/namespaces/i18n"
                       i18n:domain="lingva">
                   <span />
@@ -748,7 +755,8 @@ def test_linenumbers():
                   <div foo="bar"
                     class="blubb">
                     <dummy i18n:comment="Generic
-                                         save button"><span tal:omit-tag="" i18n:translate="dummy3">Foo</span></dummy>
+                                         save button">
+                        <span tal:omit-tag="" i18n:translate="dummy3">Foo</span></dummy>
                   </div>
                   <script>
                   // <![CDATA[
@@ -775,10 +783,10 @@ def test_linenumbers():
                             </dummy>
                         </metal:action>
                 </tal:macros>
-                """.encode("utf-8")
+                """
     messages = list(xml_extractor("filename", _options()))
     got = [(x.msgid, x.location[1]) for x in messages]
-    assert got == [("dummy1", 9), ("dummy2", 14), ("dummy3", 23), ("dummy4", 46)]
+    assert got == [("dummy1", 9), ("dummy2", 14), ("dummy3", 24), ("dummy4", 47)]
 
 
 @pytest.mark.usefixtures("fake_source")
@@ -796,11 +804,11 @@ def test_domain_filter():
 @pytest.mark.usefixtures("fake_source")
 def test_domain_filter_for_attribute():
     global source
-    source = """\
+    source = b"""\
                 <html xmlns:i18n="http://xml.zope.org/namespaces/i18n"
                       i18n:domain="lingva">
                   <dummy title="Dummy text" i18n:attributes="title"></dummy>
-                </html>""".encode("utf-8")
+                </html>"""
     messages = list(xml_extractor("filename", _options(domain="other")))
     assert len(messages) == 0
 
@@ -808,11 +816,11 @@ def test_domain_filter_for_attribute():
 @pytest.mark.usefixtures("fake_source")
 def test_domain_filter_for_expression():
     global source
-    source = """\
+    source = b"""\
                 <html xmlns:i18n="http://xml.zope.org/namespaces/i18n"
                       i18n:domain="lingva">
                   <dummy>${_(u'foo')}</dummy>
-                </html>""".encode("utf-8")
+                </html>"""
     messages = list(xml_extractor("filename", _options(domain="other")))
     assert len(messages) == 0
 
@@ -820,12 +828,12 @@ def test_domain_filter_for_expression():
 @pytest.mark.usefixtures("fake_source")
 def test_context_for_attributes():
     global source
-    source = """\
+    source = b"""\
                 <html xmlns:i18n="http://xml.zope.org/namespaces/i18n"
                       i18n:domain="lingva">
                   <span title="message" i18n:context="figure" i18n:attributes="title"></span>
                 </html>
-                """.encode("utf-8")
+                """
     messages = list(xml_extractor("filename", _options()))
     assert len(messages) == 1
     assert messages[0].msgctxt == "figure"
