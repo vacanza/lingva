@@ -78,7 +78,7 @@ class POEntry(polib.POEntry):
 
 
 class POFile(polib.POFile):
-    copyright = None
+    copyright_holder = None
     package_name = None
 
     def metadata_as_entry(self):
@@ -124,9 +124,11 @@ def list_files(files_from, sources):
             sys.exit(1)
 
 
-def find_file(filename, search_path=[]):
+def find_file(filename, search_path=None):
     """Return the filename for a given file, checking search paths."""
-    paths = [os.path.curdir] + search_path
+    if search_path is None:
+        search_path = []
+    paths = (os.path.curdir, *search_path)
     for path in paths:
         filename = os.path.join(path, filename)
         if os.path.isfile(filename):
@@ -276,7 +278,6 @@ def extract(
     msgid_bugs_address=None,
 ):
     """Extract translatable strings."""
-    directory = list(directory)
     register_extractors()
     register_babel_plugins()
 
@@ -300,6 +301,8 @@ def extract(
     )
 
     scanned = 0
+    if directory and not isinstance(directory, list):
+        directory = list(directory)
     for filename in no_duplicates(list_files(files_from, sources)):
         real_filename = find_file(filename, directory)
         if real_filename is None:
