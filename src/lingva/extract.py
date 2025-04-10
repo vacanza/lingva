@@ -269,6 +269,7 @@ def extract(
     linenumbers=True,
     width=79,
     sort_order=None,
+    allow_empty=False,
     domain=None,
     keywords=None,
     comment_tag=None,
@@ -332,7 +333,7 @@ def extract(
     if not scanned:
         click.echo("No files scanned, aborting", err=True)
         sys.exit(1)
-    if not catalog:
+    if not catalog and not allow_empty:
         click.echo("No translatable strings found, aborting", err=True)
         sys.exit(2)
 
@@ -410,6 +411,12 @@ def extract(
     flag_value="location",
     help="Order messages by file location",
 )
+@click.option(
+    "--allow-empty",
+    "allow_empty",
+    default=False,
+    help="Allow output file with no msg entries",
+)
 # Extraction configuration
 @click.option("-d", "--domain", help="Domain to extract")
 @click.option(
@@ -457,6 +464,7 @@ def main(
     linenumbers,
     width,
     sort_order,
+    allow_empty,
     domain,
     keywords,
     comment_tag,
@@ -477,6 +485,7 @@ def main(
         linenumbers,
         width,
         sort_order,
+        allow_empty,
         domain,
         keywords,
         comment_tag,
