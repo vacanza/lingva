@@ -78,7 +78,7 @@ class POEntry(polib.POEntry):
 
 
 class POFile(polib.POFile):
-    copyright = None
+    copyright_holder = None
     package_name = None
 
     def metadata_as_entry(self):
@@ -124,10 +124,9 @@ def list_files(files_from, sources):
             sys.exit(1)
 
 
-def find_file(filename, search_path=[]):
+def find_file(filename, search_path=None):
     """Return the filename for a given file, checking search paths."""
-    paths = [os.path.curdir] + search_path
-    for path in paths:
+    for path in (os.path.curdir, *(search_path or ())):
         filename = os.path.join(path, filename)
         if os.path.isfile(filename):
             return filename
@@ -267,6 +266,7 @@ def extract(
     linenumbers=True,
     width=79,
     sort_order=None,
+    allow_empty=False,
     domain=None,
     keywords=None,
     comment_tag=None,
@@ -276,7 +276,6 @@ def extract(
     msgid_bugs_address=None,
 ):
     """Extract translatable strings."""
-    directory = list(directory)
     register_extractors()
     register_babel_plugins()
 
@@ -300,6 +299,8 @@ def extract(
     )
 
     scanned = 0
+    if directory and not isinstance(directory, list):
+        directory = list(directory)
     for filename in no_duplicates(list_files(files_from, sources)):
         real_filename = find_file(filename, directory)
         if real_filename is None:
@@ -329,7 +330,7 @@ def extract(
     if not scanned:
         click.echo("No files scanned, aborting", err=True)
         sys.exit(1)
-    if not catalog:
+    if not catalog and not allow_empty:
         click.echo("No translatable strings found, aborting", err=True)
         sys.exit(2)
 
@@ -407,6 +408,12 @@ def extract(
     flag_value="location",
     help="Order messages by file location",
 )
+@click.option(
+    "--allow-empty",
+    "allow_empty",
+    default=False,
+    help="Allow output file with no msg entries",
+)
 # Extraction configuration
 @click.option("-d", "--domain", help="Domain to extract")
 @click.option(
@@ -454,6 +461,7 @@ def main(
     linenumbers,
     width,
     sort_order,
+    allow_empty,
     domain,
     keywords,
     comment_tag,
@@ -474,6 +482,7 @@ def main(
         linenumbers,
         width,
         sort_order,
+        allow_empty,
         domain,
         keywords,
         comment_tag,
