@@ -199,7 +199,7 @@ def read_config(cfg_file):
             EXTRACTORS[extractor].update_config(**extractor_config)
         elif section.startswith("extension"):
             click.echo(
-                "Use of %s section is obsolete. " 'Please use the "extensions" section.' % section,
+                'Use of %s section is obsolete. Please use the "extensions" section.' % section,
                 err=True,
             )
             extension = section[10:]

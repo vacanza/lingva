@@ -238,8 +238,7 @@ def test_translate_translated_subelement_with_id():
     assert messages[0].location[1] == 5
     assert messages[1].msgid == "msgid_dummy"
     assert (
-        messages[1].comment == "Default: Dummy ${text} demø\n"
-        'Canonical text for ${text} is: "téxt"'
+        messages[1].comment == 'Default: Dummy ${text} demø\nCanonical text for ${text} is: "téxt"'
     )
     assert messages[1].location[1] == 3
 
