@@ -5,7 +5,8 @@ authors = [
     {name = "Wichert Akkerman", email = "wichert@wiggy.net"},
 ]
 maintainers = [
-    { email = "ark@cho.red", name = "Arkadii Yakovets" },
+    { name = "Arkadii Yakovets" },
+    { name = "Serhii Murza" },
 ]
 
 readme = "README.rst"
