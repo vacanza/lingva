@@ -1,72 +1,78 @@
+[build-system]
+build-backend = "setuptools.build_meta"
+requires = [ "setuptools>=61", "wheel" ]
+
 [project]
 name = "lingva"
 description = "Translation toolset"
-authors = [
-    {name = "Wichert Akkerman", email = "wichert@wiggy.net"},
-]
-maintainers = [
-    { name = "Arkadii Yakovets" },
-    { name = "Serhii Murza" },
-]
-
 readme = "README.rst"
-dynamic = ["version"]
+keywords = [ "Babel", "gettext", "po", "translation" ]
 license = "BSD-3-Clause"
-license-files = ["LICENSE"]
-keywords = ["translation", "po", "gettext", "Babel"]
+license-files = [ "LICENSE" ]
+maintainers = [
+  { name = "Arkadii Yakovets" },
+  { name = "Serhii Murza" },
+]
+authors = [
+  { name = "Wichert Akkerman", email = "wichert@wiggy.net" },
+]
+requires-python = ">=3.10"
+
 classifiers = [
-    "Intended Audience :: Developers",
-    "Operating System :: OS Independent",
-    "Programming Language :: Python :: 3",
-    "Topic :: Software Development :: Libraries :: Python Modules",
+  "Intended Audience :: Developers",
+  "Operating System :: OS Independent",
+  "Programming Language :: Python :: 3 :: Only",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Programming Language :: Python :: 3.14",
+  "Topic :: Software Development :: Libraries :: Python Modules",
 ]
+dynamic = [ "version" ]
 dependencies = [
-    "click >= 8.0.3",
-    "polib >= 1.1.1"
+  "click>=8,<9",
+  "polib>=1.2,<2",
 ]
 
-[project.optional-dependencies]
+optional-dependencies.chameleon = [
+  "chameleon",
+]
+urls.homepage = "https://github.com/vacanza/lingva"
+urls.tracker = "https://github.com/vacanza/lingva/issues"
+scripts.polint = "lingva.polint:main"
+scripts.pot-create = "lingva.extract:main"
+entry-points."lingva.extractors".chameleon = "lingva.extractors.xml:ChameleonExtractor"
+entry-points."lingva.extractors".python = "lingva.extractors.python:PythonExtractor"
+entry-points."lingva.extractors".xml = "lingva.extractors.xml:ChameleonExtractor"
+entry-points."lingva.extractors".zcml = "lingva.extractors.zcml:ZCMLExtractor"
+entry-points."lingva.extractors".zope = "lingva.extractors.xml:ZopeExtractor"
+
+[dependency-groups]
 dev = [
-    "pytest >= 8.0.0",
-    "ruff >= 0.11.0"
+  "pre-commit>=4.5,<5",
+  "pytest>=9,<10",
 ]
-chameleon = [
-    "chameleon"
-]
-
-[project.scripts]
-polint = "lingva.polint:main"
-pot-create = "lingva.extract:main"
-
-[project.entry-points."lingva.extractors"]
-python = "lingva.extractors.python:PythonExtractor"
-chameleon = "lingva.extractors.xml:ChameleonExtractor"
-xml = "lingva.extractors.xml:ChameleonExtractor"
-zope = "lingva.extractors.xml:ZopeExtractor"
-zcml = "lingva.extractors.zcml:ZCMLExtractor"
-
-[project.urls]
-homepage = "https://github.com/vacanza/lingva"
-tracker = "https://github.com/vacanza/lingva/issues"
-
-[tool.pytest.ini_options]
-testpaths = "tests"
-norecursedirs = ".git tmp* .eggs bin build include lib share src"
 
 [tool.setuptools.dynamic]
-version = { attr = "lingva.__version__" }
+version = { file = "VERSION" }
+
+[tool.setuptools.packages.find]
+where = [ "src" ]
+
+[tool.ruff]
+target-version = "py310"
+
+line-length = 99
+lint.select = [ "E4", "E5", "E7", "E9", "F", "W" ]
+lint.flake8-errmsg.max-string-length = 99
 
 [tool.isort]
-known_first_party = ["lingva", "tests"]
+known_first_party = [ "lingva", "tests" ]
 line_length = 99
 multi_line_output = 3
 profile = "black"
 
-[tool.ruff]
-line-length = 99
-
-[tool.ruff.lint]
-select = ["E4", "E5", "E7", "E9", "F", "W"]
-
-[tool.ruff.lint.flake8-errmsg]
-max-string-length = 99
+[tool.pytest.ini_options]
+testpaths = "tests"
+norecursedirs = ".git tmp* .eggs bin build include lib share src"

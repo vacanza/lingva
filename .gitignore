@@ -1,6 +1,5 @@
 /.cache
 /.Python
-/src/lingva.egg-info
 /bin/
 /build
 /dist
@@ -18,6 +17,7 @@
 *.pyo
 *.pyc
 *.egg
+*.egg-info
 *.swp
 .vscode
 .idea
