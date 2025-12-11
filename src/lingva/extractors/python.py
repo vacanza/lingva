@@ -1,5 +1,3 @@
-from __future__ import print_function
-
 import ast
 import io
 import sys
@@ -15,12 +13,6 @@ from . import (
     check_python_format,
     update_keywords,
 )
-
-try:
-    basestring
-except NameError:
-    basestring = str
-
 
 KEYWORDS = {
     "gettext": Keyword("gettext"),
@@ -51,11 +43,8 @@ def parse_keyword(arguments, keyword, filename, firstline):
         if not param:
             return None
         (arg_name, arg_value, lineno) = arguments[param - 1]
-        if not isinstance(arg_value, basestring):
-            print(
-                "%s[%d]: %s" % (filename, firstline + lineno, error_msg),
-                file=sys.stderr,
-            )
+        if not isinstance(arg_value, str):
+            print(f"{filename}[{firstline + lineno}]: {error_msg}", file=sys.stderr)
             raise IndexError()
         else:
             return arg_value
@@ -70,7 +59,7 @@ def parse_keyword(arguments, keyword, filename, firstline):
         comment = keyword.comment
     except IndexError:
         return None
-    return (domain, msgctxt, msgid, msgid_plural, comment)
+    return domain, msgctxt, msgid, msgid_plural, comment
 
 
 def parse_translationstring(arguments, filename, firstline):
@@ -83,12 +72,12 @@ def parse_translationstring(arguments, filename, firstline):
     args = [a[1] for a in arguments if a[0] is None]
     kwargs = dict((a[0], a[1]) for a in arguments if a[0] is not None)
 
-    if isinstance(args[0], basestring):
+    if isinstance(args[0], str):
         msgid = args[0]
-    if len(args) > 2 and isinstance(args[2], basestring):
+    if len(args) > 2 and isinstance(args[2], str):
         default = args[2]
     for key, value in kwargs.items():
-        if not isinstance(value, basestring):
+        if not isinstance(value, str):
             continue
         if key == "msgid":
             msgid = value
@@ -99,13 +88,13 @@ def parse_translationstring(arguments, filename, firstline):
     if not msgid:
         return None
 
-    comment = "Default: %s" % default if default else ""
-    return (None, context, msgid, None, comment)
+    comment = f"Default: {default}" if default else ""
+    return None, context, msgid, None, comment
 
 
 def _open(filename):
     """Injection point for tests."""
-    return open(filename, "r", encoding="utf-8")
+    return open(filename, encoding="utf-8")
 
 
 def safe_eval(s):
@@ -117,7 +106,7 @@ def safe_eval(s):
 DYNAMIC = []
 
 
-class _SafeReadline(object):
+class _SafeReadline:
     def __init__(self, readline):
         self.readline = readline
 
@@ -134,7 +123,7 @@ class _SafeReadline(object):
         return line
 
 
-class TokenStreamer(object):
+class TokenStreamer:
     def __init__(self, readline):
         self.queue = tokenize.generate_tokens(_SafeReadline(readline))
         self.pushed = []
@@ -170,7 +159,7 @@ class TokenStreamer(object):
     __next__ = next  # For Python 3 compatibility
 
 
-class PythonParser(object):
+class PythonParser:
     last_comment = (-2, None)
 
     def __call__(self, token_stream, options, filename, firstline):
@@ -191,15 +180,14 @@ class PythonParser(object):
                 self.process_token(token_type, token, location, token_stream)
         except tokenize.TokenError as e:
             print(
-                "Aborting due to parse error in %s[%d]: %s"
-                % (filename, firstline + e.args[1][0], e.args[0]),
+                f"Aborting due to parse error in {filename}[{firstline + e.args[1][0]}]: "
+                f"{e.args[0]}",
                 file=sys.stderr,
             )
             sys.exit(1)
         except ParseError as e:
             print(
-                "Aborting due to parse error in %s[%d]: %s"
-                % (filename, firstline + e.lineno, e.args[0]),
+                f"Aborting due to parse error in {filename}[{firstline + e.lineno}]: {e.args[0]}",
                 file=sys.stderr,
             )
             sys.exit(1)
@@ -298,7 +286,7 @@ class PythonParser(object):
             elif token == ".":
                 pass
             else:
-                raise ParseError("Unexpected token: %s" % token, location[0])
+                raise ParseError(f"Unexpected token: {token}", location[0])
         elif token_type == tokenize.STRING:
             if self.in_string:
                 token = safe_eval(token)
@@ -314,7 +302,7 @@ class PythonParser(object):
                 self.in_string = True
         elif token_type == tokenize.NUMBER:
             if self.in_argument:
-                raise ParseError("Unexpected number: %s" % token, location[0])
+                raise ParseError(f"Unexpected number: {token}", location[0])
             self.add_argument(safe_eval(token), location[0])
         elif token_type == tokenize.NAME:
             self.in_argument = True
@@ -329,11 +317,11 @@ class PythonParser(object):
                 self.add_argument(DYNAMIC, location[0])
             elif next_token_type == tokenize.OP and next_token == "=":
                 if self.argument_name is not None:
-                    raise ParseError("Unexpected token: %s" % token, location[0])
+                    raise ParseError(f"Unexpected token: {token}", location[0])
                 next(token_stream)  # Pop the equal token
                 self.argument_name = token
         else:
-            raise ParseError("Unexpected token: %s" % token, location[0])
+            raise ParseError(f"Unexpected token: {token}", location[0])
         # XXX Does this handle trailing comma: func(foo,x bar,)
 
     def add_argument(self, value, lineno):

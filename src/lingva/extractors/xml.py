@@ -1,15 +1,8 @@
-from __future__ import absolute_import, print_function
-
 import ast
 import collections
-
-try:
-    from collections import OrderedDict
-except ImportError:
-    from ordereddict import OrderedDict
-
 import re
 import sys
+from collections import OrderedDict
 
 from chameleon.namespaces import I18N_NS, TAL_NS
 from chameleon.program import ElementProgram
@@ -34,7 +27,7 @@ EXPRESSION = re.compile(r"\s*\${(.*?)}\s*")
 UNDERSCORE_CALL = re.compile(r"_\(.*\)")
 
 
-class TranslateContext(object):
+class TranslateContext:
     def __init__(self, domain, msgctxt, msgid, comment, filename, lineno):
         self.domain = domain
         self.msgctxt = msgctxt
@@ -53,7 +46,7 @@ class TranslateContext(object):
         attributes = element["ns_attrs"]
         name = attributes.get((I18N_NS, "name"))
         if name:
-            self.text.append("${%s}" % name)
+            self.text.append(f"${{{name}}}")
         else:
             self.text.append("<dynamic element>")
 
@@ -83,11 +76,11 @@ class TranslateContext(object):
         if self.comment:
             comments.append(self.comment)
         if text:
-            comments.append("Default: %s" % text)
+            comments.append(f"Default: {text}")
         for name, context in self.children.items():
-            comments.append('Canonical text for ${%s} is: "%s"' % (name, context.full_text()))
+            comments.append(f'Canonical text for ${{{name}}} is: "{context.full_text()}"')
         if self.parent:
-            comments.append('Used in sentence: "%s"' % self.parent.full_text())
+            comments.append(f'Used in sentence: "{self.parent.full_text()}"')
         return Message(
             self.msgctxt,
             self.msgid,
@@ -138,27 +131,21 @@ class ChameleonExtractor(Extractor, ElementProgram):
             source = fileobj.read().decode("utf-8")
             ElementProgram.__init__(self, source, filename=filename)
         except UnicodeDecodeError as e:
-            print(
-                "Aborting due to parse error in %s: %s" % (self.filename, e),
-                file=sys.stderr,
-            )
+            print(f"Aborting due to parse error in {self.filename}: {e}", file=sys.stderr)
             sys.exit(1)
         except KeyError as e:  # Chameleon attribute error
-            print(
-                "Aborting due to parse error in %s: %s" % (self.filename, e.message),
-                file=sys.stderr,
-            )
+            print(f"Aborting due to parse error in {self.filename}: {e.message}", file=sys.stderr)
             sys.exit(1)
         return [m.message() if isinstance(m, TranslateContext) else m for m in self.messages]
 
     def visit(self, kind, args):
-        visitor = getattr(self, "visit_%s" % kind, None)
+        visitor = getattr(self, f"visit_{kind}", None)
         if visitor is not None:
             return visitor(*args)
         else:
             print(
-                "Warning: Unknown node type '%s' in %s, linenumbers might be off. "
-                "Please report this warning." % (kind, self.filename),
+                f"Warning: Unknown node type '{kind}' in {self.filename}, "
+                "linenumbers might be off. Please report this warning.",
                 file=sys.stderr,
             )
 
@@ -239,10 +226,7 @@ class ChameleonExtractor(Extractor, ElementProgram):
                             continue
                         value, offset, post_offset = plain_attrs[attr]
                         self.add_message(
-                            self.domainstack[-1][1],
-                            msgid,
-                            "Default: %s" % value,
-                            offset=offset,
+                            self.domainstack[-1][1], msgid, f"Default: {value}", offset=offset
                         )
 
             for attribute, value in attributes.items():
@@ -279,8 +263,8 @@ class ChameleonExtractor(Extractor, ElementProgram):
                             self.parse_python(source)
                 except SyntaxError:
                     print(
-                        "Aborting due to Python syntax error in %s[%d]: %s"
-                        % (self.filename, self.linenumber, line)
+                        "Aborting due to Python syntax error "
+                        f"in {self.filename}[{self.linenumber}]: {line}"
                     )
                     sys.exit(1)
             if self.translatestack[-1]:
@@ -299,8 +283,8 @@ class ChameleonExtractor(Extractor, ElementProgram):
     def visit_default(self, data):
         if not data.lower().startswith("<!doctype"):
             print(
-                "%s:%s\n    Warning: Node type 'default', possible bad markup"
-                % (self.filename, self.linenumber),
+                f"{self.filename}:{self.linenumber}\n    "
+                "Warning: Node type 'default', possible bad markup",
                 file=sys.stderr,
             )
         self.linenumber += get_newline_count(data)
@@ -321,8 +305,8 @@ class ChameleonExtractor(Extractor, ElementProgram):
     def _assert_valid_python(self, value):
         if not is_valid_python(value):
             print(
-                "Aborting due to Python syntax error in %s[%d]: %s"
-                % (self.filename, self.linenumber, value)
+                "Aborting due to Python syntax error in "
+                f"{self.filename}[{self.linenumber}]: {value}"
             )
             sys.exit(1)
 
@@ -340,22 +324,22 @@ class ChameleonExtractor(Extractor, ElementProgram):
                             m = None
                             value = value.split(":", 1)[1]
                         if m is None:
-                            value = "(%s)" % value
+                            value = f"({value})"
                             self._assert_valid_python(value)
                             yield value
             if attribute[1] == "define":
                 for scope, var, value in parse_defines(value):
                     for engine, value in split_expression(value, default_engine):
                         if engine == "python":
-                            value = "(%s)" % value
+                            value = f"({value})"
                             self._assert_valid_python(value)
                             yield value
             elif attribute[1] == "repeat":
                 defines = parse_defines(value)
                 if len(defines) != 1:
                     print(
-                        "Aborting due to syntax error in %s[%d]: %s"
-                        % (self.filename, self.linenumber, value)
+                        "Aborting due to syntax error in "
+                        f"{self.filename}[{self.linenumber}]: {value}"
                     )
                 scope, var, value = defines[0]
                 for engine, value in split_expression(value, default_engine):
@@ -364,17 +348,16 @@ class ChameleonExtractor(Extractor, ElementProgram):
                         yield value
         else:
             try:
-                for source in get_python_expressions(value, default_engine):
-                    yield source
+                yield from get_python_expressions(value, default_engine)
             except SyntaxError:
                 print(
-                    "Aborting due to Python syntax error in %s[%d]: %s"
-                    % (self.filename, self.linenumber, value)
+                    "Aborting due to Python syntax error in "
+                    f"{self.filename}[{self.linenumber}]: {value}"
                 )
                 sys.exit(1)
 
     def parse_python(self, source):
-        assert isinstance(source, type(""))
+        assert isinstance(source, str)
         for message in _extract_python(self.filename, source, self.options, self.linenumber):
             self.messages.append(
                 Message(
@@ -441,8 +424,7 @@ def get_python_expressions(source, default_engine):
             ]
             if all(is_valid_python(c) for c in candidates):
                 # All valid, so return and move to next ${ block
-                for c in candidates:
-                    yield c
+                yield from candidates
                 source = source[m.end() :]
                 break
             else:

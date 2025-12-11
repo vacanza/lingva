@@ -1,5 +1,3 @@
-from __future__ import print_function
-
 import abc
 import collections
 import os
@@ -74,10 +72,10 @@ def check_comment_flags(comment):
     if flags is not None:
         return (re.split("\\s*,\\s*", flags.group(1)), flags.group(2))
     else:
-        return ([], comment)
+        return [], comment
 
 
-class Keyword(object):
+class Keyword:
     msgctxt_param = None
     domain_param = None
     comment = ""
@@ -124,7 +122,7 @@ class Keyword(object):
                 else:
                     kw.msgid_plural_param = int(param)
         except SyntaxError:
-            raise ValueError("Invalid keyword spec: %s" % spec)
+            raise ValueError(f"Invalid keyword spec: {spec}")
         return kw
 
 
@@ -141,7 +139,7 @@ def update_keywords(keywords, specs):
 
 
 @add_metaclass(abc.ABCMeta)
-class Extractor(object):
+class Extractor:
     default_config = {}
 
     def __init__(self, config=None):

@@ -1,15 +1,9 @@
-import io
-
-try:
-    from collections import OrderedDict
-except ImportError:
-    from ordereddict import OrderedDict
-
 import os
 import re
 import sys
 import tempfile
 import time
+from collections import OrderedDict
 from configparser import ConfigParser as SafeConfigParser
 from operator import attrgetter
 
@@ -24,7 +18,7 @@ from lingva.extractors.babel import register_babel_plugins
 def po_timestamp():
     local = time.localtime()
     offset = -(time.altzone if local.tm_isdst else time.timezone)
-    return "%s%s%s" % (
+    return "{}{}{}".format(
         time.strftime("%Y-%m-%d %H:%M", local),
         "-" if offset < 0 else "+",
         time.strftime("%H%M", time.gmtime(abs(offset))),
@@ -60,7 +54,7 @@ class POEntry(polib.POEntry):
         pass
 
     def __eq__(self, other):
-        r = super(POEntry, self).__eq__(other)
+        r = super().__eq__(other)
         if not r:
             return False
         return _same_text(other.comment, self.comment) and _same_text(
@@ -86,12 +80,11 @@ class POFile(polib.POFile):
         year = time.localtime().tm_year
         header = ["SOME DESCRIPTIVE TITLE"]
         if self.copyright_holder:
-            header.append("Copyright (C) %d %s" % (year, self.copyright_holder))
+            header.append(f"Copyright (C) {year} {self.copyright_holder}")
         header.append(
-            "This file is distributed under the same license as the %s package."
-            % self.package_name
+            f"This file is distributed under the same license as the {self.package_name} package."
         )
-        header.append("FIRST AUTHOR <EMAIL@ADDRESS>, %d." % year)
+        header.append(f"FIRST AUTHOR <EMAIL@ADDRESS>, {year}.")
         entry.tcomment = "\n".join(header)
         return entry
 
@@ -120,7 +113,7 @@ def list_files(files_from, sources):
                     if get_extractor(file) is not None:
                         yield os.path.join(dirpath, file)
         else:
-            click.echo("Invalid file type for %s" % file, err=True)
+            click.echo(f"Invalid file type for {file}", err=True)
             sys.exit(1)
 
 
@@ -164,14 +157,14 @@ def create_catalog(width, copyright_holder, package_name, package_version, msgid
     catalog.metadata["MIME-Version"] = "1.0"
     catalog.metadata["Content-Type"] = "text/plain; charset=UTF-8"
     catalog.metadata["Content-Transfer-Encoding"] = "8bit"
-    catalog.metadata["Generated-By"] = "Lingva %s" % __version__
+    catalog.metadata["Generated-By"] = f"Lingva {__version__}"
     return catalog
 
 
 def _register_extension(extension, extractor):
     if extractor not in EXTRACTORS:
         click.echo(
-            "Unknown extractor %s. Check --list-extractors for available options" % extractor,
+            f"Unknown extractor {extractor}. Check --list-extractors for available options",
             err=True,
         )
         sys.exit(1)
@@ -189,8 +182,8 @@ def read_config(cfg_file):
             extractor = section[10:]
             if extractor not in EXTRACTORS:
                 click.echo(
-                    "Unknown extractor %s. "
-                    "Check --list-extractors for available options" % extractor,
+                    f"Unknown extractor {extractor}. "
+                    "Check --list-extractors for available options",
                     err=True,
                 )
                 sys.exit(1)
@@ -198,13 +191,13 @@ def read_config(cfg_file):
             EXTRACTORS[extractor].update_config(**extractor_config)
         elif section.startswith("extension"):
             click.echo(
-                'Use of %s section is obsolete. Please use the "extensions" section.' % section,
+                f'Use of {section} section is obsolete. Please use the "extensions" section.',
                 err=True,
             )
             extension = section[10:]
             plugin = config.get(section, "plugin")
             if not plugin:
-                click.echo("No plugin defined for extension %s" % extension, err=True)
+                click.echo(f"No plugin defined for extension {extension}", err=True)
             _register_extension(extension, plugin)
 
 
@@ -232,11 +225,11 @@ def save_catalog(catalog, filename):
         except (OSError, UnicodeDecodeError):
             pass
         if old_catalog is not None and identical(catalog, old_catalog):
-            click.echo("No changes found - not replacing %s" % filename)
+            click.echo(f"No changes found - not replacing {filename}")
             return
         os.unlink(filename)
     (fd, tmpfile) = tempfile.mkstemp(dir=os.path.dirname(filename), text=True)
-    output = io.open(fd, "wt", encoding=catalog.encoding)
+    output = open(fd, "w", encoding=catalog.encoding)
     output.write(catalog.__unicode__())
     output.close()
     os.rename(tmpfile, filename)
@@ -283,7 +276,7 @@ def extract(
         comment_tag = True
     if list_extractors:
         for extractor in sorted(EXTRACTORS):
-            click.echo("%-17s %s" % (extractor, EXTRACTORS[extractor].__doc__ or ""))
+            click.echo(f"{extractor:<17} {EXTRACTORS[extractor].__doc__ or ''}")
         return
 
     if cfg_file:
@@ -292,7 +285,7 @@ def extract(
         user_home = os.path.expanduser("~")
         global_config = os.path.join(user_home, ".config", "lingva")
         if os.path.exists(global_config):
-            read_config(open(global_config, "r"))
+            read_config(open(global_config))
 
     catalog = create_catalog(
         width, copyright_holder, package_name, package_version, msgid_bugs_address
@@ -304,11 +297,11 @@ def extract(
     for filename in no_duplicates(list_files(files_from, sources)):
         real_filename = find_file(filename, directory)
         if real_filename is None:
-            click.echo("Can not find file %s" % filename, err=True)
+            click.echo(f"Can not find file {filename}", err=True)
             sys.exit(1)
         extractor = get_extractor(real_filename)
         if extractor is None:
-            click.echo("No extractor available for file %s" % filename, err=True)
+            click.echo(f"No extractor available for file {filename}", err=True)
             sys.exit(1)
 
         extractor_options = ExtractorOptions(

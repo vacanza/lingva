@@ -1,9 +1,5 @@
-try:
-    from unittest import mock
-except ImportError:
-    import mock
-
 from io import BytesIO
+from unittest import mock
 
 import pytest
 
@@ -51,7 +47,7 @@ def test_attributes_plain():
                       i18n:domain="lingva">
                   <dummy i18n:attributes="title" title="tést title"/>
                 </html>
-                """.encode("utf-8")
+                """.encode()
     messages = list(xml_extractor("filename", _options()))
     assert len(messages) == 1
     assert messages[0].msgid == "tést title"
@@ -84,7 +80,7 @@ def test_attributes_explicit_MessageId():
                        i18n:domain="lingva">
                    <dummy i18n:attributes="title msg_title" title="test tïtle"/>
                  </html>
-                  """.encode("utf-8")
+                  """.encode()
     messages = list(xml_extractor("filename", _options()))
     assert len(messages) == 1
     assert messages[0].msgid == "msg_title"
@@ -110,7 +106,7 @@ def test_attributes_multiple_attributes():
                        i18n:domain="lingva">
                    <dummy i18n:attributes="title ; alt" title="tést title"
                           alt="test ålt"/>
-                 </html>""".encode("utf-8")
+                 </html>""".encode()
     messages = list(xml_extractor("filename", _options()))
     assert len(messages) == 2
     assert [m.msgid for m in messages] == ["tést title", "test ålt"]
@@ -124,7 +120,7 @@ def test_attributes_multiple_attributes_explicit_msgid():
                       i18n:domain="lingva">
                   <dummy i18n:attributes="title msg_title; alt msg_alt"
                          title="test titlé" alt="test ålt"/>
-                </html>""".encode("utf-8")
+                </html>""".encode()
     messages = list(xml_extractor("filename", _options()))
     assert len(messages) == 2
     assert messages[0].msgid == "msg_title"
@@ -141,7 +137,7 @@ def test_translate_minimal():
                 <html xmlns:i18n="http://xml.zope.org/namespaces/i18n"
                       i18n:domain="lingva">
                   <dummy i18n:translate="">Dummy téxt</dummy>
-                </html>""".encode("utf-8")
+                </html>""".encode()
     messages = list(xml_extractor("filename", _options()))
     assert len(messages) == 1
     assert messages[0].msgid == "Dummy téxt"
@@ -155,7 +151,7 @@ def test_translate_explicit_msgid():
                 <html xmlns:i18n="http://xml.zope.org/namespaces/i18n"
                       i18n:domain="lingva">
                   <dummy i18n:translate="msgid_dummy">Dummy téxt</dummy>
-                </html>""".encode("utf-8")
+                </html>""".encode()
     messages = list(xml_extractor("filename", _options()))
     assert len(messages) == 1
     assert messages[0].msgid == "msgid_dummy"
@@ -172,7 +168,7 @@ def test_translate_subelement():
                   <dummy i18n:translate="msgid_dummy">Dummy
                     <strong>text</strong> demø</dummy>
                 </html>
-                """.encode("utf-8")
+                """.encode()
     messages = list(xml_extractor("filename", _options()))
     assert len(messages) == 1
     assert messages[0].msgid == "msgid_dummy"
@@ -189,7 +185,7 @@ def test_translate_named_subelement():
                   <dummy i18n:translate="msgid_dummy">Dummy
                     <strong i18n:name="text">téxt</strong> demø</dummy>
                 </html>
-                """.encode("utf-8")
+                """.encode()
     messages = list(xml_extractor("filename", _options()))
     assert len(messages) == 1
     assert messages[0].msgid == "msgid_dummy"
@@ -208,7 +204,7 @@ def test_translate_translated_subelement():
                             i18n:translate="">téxt</strong>
                     demø</dummy>
                 </html>
-                """.encode("utf-8")
+                """.encode()
     messages = list(xml_extractor("filename", _options()))
     assert len(messages) == 2
     assert messages[0].msgid == "téxt"
@@ -230,7 +226,7 @@ def test_translate_translated_subelement_with_id():
                             i18n:translate="msgid_text">téxt</strong>
                     demø</dummy>
                 </html>
-                """.encode("utf-8")
+                """.encode()
     messages = list(xml_extractor("filename", _options()))
     assert len(messages) == 2
     assert messages[0].msgid == "msgid_text"
@@ -519,7 +515,7 @@ def test_curly_brace_related_syntax_error():
         list(xml_extractor("filename", _options()))
 
 
-class Test_get_python_expression(object):
+class Test_get_python_expression:
     def test_no_expressions(self):
         assert list(get_python_expressions("no python here", "python")) == []
 
@@ -557,7 +553,7 @@ def test_ignore_structure_in_replace():
                       i18n:domain="lingva">
                   <dummy tal:replace="structure _(u'føo')">Dummy</dummy>
                 </html>
-                """.encode("utf-8")
+                """.encode()
     messages = list(xml_extractor("filename", _options()))
     assert messages[0].msgid == "føo"
 
@@ -570,7 +566,7 @@ def test_repeat_multiple_assignment():
                       i18n:domain="lingva">
                   <dummy tal:repeat="(ix, item) [(1, _(u'føo'))]">Dummy</dummy>
                 </html>
-                """.encode("utf-8")
+                """.encode()
     messages = list(xml_extractor("filename", _options()))
     assert messages[0].msgid == "føo"
 
@@ -584,7 +580,7 @@ def test_carriage_return_in_define():
                   <dummy tal:define="foo True or
                                      _(u'føo')">Dummy</dummy>
                 </html>
-                """.encode("utf-8")
+                """.encode()
     messages = list(xml_extractor("filename", _options()))
     assert messages[0].msgid == "føo"
 
@@ -598,7 +594,7 @@ def test_multiline_replace():
                   <dummy tal:replace="True or
                                       _(u'føo')">Dummy</dummy>
                 </html>
-                """.encode("utf-8")
+                """.encode()
     messages = list(xml_extractor("filename", _options()))
     assert messages[0].msgid == "føo"
 
@@ -612,7 +608,7 @@ def test_multiline_replace_with_structure():
                   <dummy tal:replace="structure True or
                                       _(u'føo')">Dummy</dummy>
                 </html>
-                """.encode("utf-8")
+                """.encode()
     messages = list(xml_extractor("filename", _options()))
     assert messages[0].msgid == "føo"
 
@@ -795,7 +791,7 @@ def test_domain_filter():
                 <html xmlns:i18n="http://xml.zope.org/namespaces/i18n"
                       i18n:domain="lingva">
                   <dummy i18n:translate="">Dummy téxt</dummy>
-                </html>""".encode("utf-8")
+                </html>""".encode()
     messages = list(xml_extractor("filename", _options(domain="other")))
     assert len(messages) == 0
 

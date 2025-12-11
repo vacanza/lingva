@@ -1,10 +1,6 @@
-try:
-    from unittest import mock
-except ImportError:
-    import mock
-
 import io
 import warnings
+from unittest import mock
 
 import pytest
 
