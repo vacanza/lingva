@@ -1,3 +1,3 @@
-"""Translation toolset"""
+from importlib.metadata import version
 
-__version__ = "5.0.6"
+__version__ = version("lingva")
