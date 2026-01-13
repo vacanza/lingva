@@ -409,7 +409,7 @@ def extract(
     help="Order messages by file location",
 )
 @click.option(
-    "--allow-empty",
+    "--allow-empty/--no-allow-empty",
     "allow_empty",
     default=False,
     help="Allow output file with no msg entries",
