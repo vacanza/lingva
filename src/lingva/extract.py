@@ -2,9 +2,9 @@ import os
 import re
 import sys
 import tempfile
-import time
 from collections import OrderedDict
 from configparser import ConfigParser as SafeConfigParser
+from datetime import datetime
 from operator import attrgetter
 
 import click
@@ -16,13 +16,8 @@ from lingva.extractors.babel import register_babel_plugins
 
 
 def po_timestamp():
-    local = time.localtime()
-    offset = -(time.altzone if local.tm_isdst else time.timezone)
-    return "{}{}{}".format(
-        time.strftime("%Y-%m-%d %H:%M", local),
-        "-" if offset < 0 else "+",
-        time.strftime("%H%M", time.gmtime(abs(offset))),
-    )
+    now = datetime.now().astimezone()
+    return f"{now:%Y-%m-%d %H:%M%z}"
 
 
 def _same_text(a, b):
@@ -77,7 +72,7 @@ class POFile(polib.POFile):
 
     def metadata_as_entry(self):
         entry = polib.POFile.metadata_as_entry(self)
-        year = time.localtime().tm_year
+        year = datetime.now().year
         header = ["SOME DESCRIPTIVE TITLE"]
         if self.copyright_holder:
             header.append(f"Copyright (C) {year} {self.copyright_holder}")
