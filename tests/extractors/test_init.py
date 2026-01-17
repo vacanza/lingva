@@ -41,7 +41,7 @@ def test_strftime_is_not_c_format():
     assert "c-format" not in flags
 
 
-class TestKeywordFromSpec(object):
+class TestKeywordFromSpec:
     def test_minimal(self):
         kw = Keyword.from_spec("gettext")
         assert kw.function == "gettext"

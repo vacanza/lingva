@@ -23,7 +23,7 @@ class BabelExtractor(Extractor):
                 args = [args]
             if function in self.keywords:
                 args = [(None, a, lineno) for a in args]
-                (domain, msgctxt, msgid, msgid_plural, c) = parse_keyword(
+                domain, msgctxt, msgid, msgid_plural, c = parse_keyword(
                     args, self.keywords[function], filename, lineno
                 )
                 if c:
@@ -50,11 +50,7 @@ class BabelExtractor(Extractor):
 
 
 def register_babel_plugins():
-    try:
-        babel_entry_points = entry_points(group="babel.extractors")
-    except TypeError:  # <= Python 3.9
-        babel_entry_points = entry_points()["babel.extractors"]
-
+    babel_entry_points = entry_points(group="babel.extractors")
     for entry_point in babel_entry_points:
         try:
             extractor = entry_point.load()
@@ -63,11 +59,11 @@ def register_babel_plugins():
         if extractor:
             name = entry_point.name
             cls = type(
-                "BabelExtractor_%s" % name,
+                f"BabelExtractor_{name}",
                 (BabelExtractor, object),
                 {
                     "extractor": staticmethod(extractor),
                     "__doc__": extractor.__doc__.splitlines()[0],
                 },
             )
-            EXTRACTORS["babel-%s" % name] = cls()
+            EXTRACTORS[f"babel-{name}"] = cls()

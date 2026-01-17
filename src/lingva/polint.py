@@ -6,11 +6,11 @@ import polib
 
 
 def verify_po(path, show_path):
-    leader = "[%s] " % path if show_path else ""
+    leader = f"[{path}] " if show_path else ""
     try:
         catalog = polib.pofile(path)
     except UnicodeDecodeError:
-        click.echo("Character encoding problems occured while parsing %s" % path)
+        click.echo(f"Character encoding problems occured while parsing {path}")
         click.echo("Perhaps this is not a PO file?")
         return
     msgids = collections.defaultdict(int)
@@ -25,10 +25,10 @@ def verify_po(path, show_path):
     for key, count in msgids.items():
         if count == 1:
             continue
-        click.echo("%sMessage repeated %d times:" % (leader, count))
-        (context, msgid) = key
+        click.echo(f"{leader}Message repeated {count} times:")
+        context, msgid = key
         if context:
-            msgid = "[%s] %s" % (context, msgid)
+            msgid = f"[{context}] {msgid}"
         click.echo(textwrap.fill(msgid, initial_indent=" " * 5, subsequent_indent=" " * 8))
         click.echo()
 
@@ -36,15 +36,15 @@ def verify_po(path, show_path):
         if len(keys) == 1:
             continue
 
-        click.echo("%sTranslation:" % leader)
+        click.echo(f"{leader}Translation:")
         click.echo(textwrap.fill(msgstr, initial_indent=" " * 8, subsequent_indent=" " * 8))
-        click.echo("Used for %d canonical texts:" % len(keys))
+        click.echo(f"Used for {len(keys)} canonical texts:")
         for idx, info in enumerate(keys):
-            (context, msgid) = info
+            context, msgid = info
             if context:
-                msgid = "[%s] %s" % (context, msgid)
+                msgid = f"[{context}] {msgid}"
             click.echo(
-                textwrap.fill(msgid, initial_indent="%-8d" % (idx + 1), subsequent_indent=8 * " ")
+                textwrap.fill(msgid, initial_indent=f"{idx + 1:<8}", subsequent_indent=8 * " ")
             )
         click.echo()
 

@@ -1,5 +1,3 @@
-from __future__ import absolute_import, print_function
-
 import collections
 import sys
 from xml.parsers import expat
@@ -31,7 +29,7 @@ class ZCMLExtractor(Extractor):
         try:
             self.parser.ParseFile(fileobj)
         except expat.ExpatError as e:
-            print("Aborting due to parse error in %s: %s" % (filename, e), file=sys.stderr)
+            print(f"Aborting due to parse error in {filename}: {e}", file=sys.stderr)
             sys.exit(1)
         return self.messages
 
