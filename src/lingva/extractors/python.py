@@ -42,7 +42,7 @@ def parse_keyword(arguments, keyword, filename, firstline):
     def get_string(param, error_msg):
         if not param:
             return None
-        (arg_name, arg_value, lineno) = arguments[param - 1]
+        arg_name, arg_value, lineno = arguments[param - 1]
         if not isinstance(arg_value, str):
             print(f"{filename}[{firstline + lineno}]: {error_msg}", file=sys.stderr)
             raise IndexError()
@@ -133,8 +133,8 @@ class TokenStreamer:
         return self
 
     def _transform(self, raw_token):
-        (token_type, token, loc_start, loc_end, line) = raw_token
-        return (token_type, token, loc_start, self)
+        token_type, token, loc_start, loc_end, line = raw_token
+        return token_type, token, loc_start, self
 
     def push(self, token):
         self.pushed.append(token)
@@ -213,7 +213,7 @@ class PythonParser:
         if self.include_comments == "all" or comment.startswith(self.comment_marker):
             if self.include_comments == "tagged":
                 comment = comment[len(self.comment_marker) :].strip()
-            (flags, comment) = check_comment_flags(comment)
+            flags, comment = check_comment_flags(comment)
             if self.messages and self.messages[-1].location[1] == (self.firstline + location[0]):
                 last_message = self.messages[-1]
                 # Comment at the end of the line of a keyword call
@@ -306,7 +306,7 @@ class PythonParser:
             self.add_argument(safe_eval(token), location[0])
         elif token_type == tokenize.NAME:
             self.in_argument = True
-            (next_token_type, next_token) = token_stream.peek()[:2]
+            next_token_type, next_token = token_stream.peek()[:2]
             if next_token_type == tokenize.OP and next_token in ",)":
                 # Variable reference
                 self.add_argument(DYNAMIC, location[0])

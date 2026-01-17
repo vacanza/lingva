@@ -26,7 +26,7 @@ def verify_po(path, show_path):
         if count == 1:
             continue
         click.echo(f"{leader}Message repeated {count} times:")
-        (context, msgid) = key
+        context, msgid = key
         if context:
             msgid = f"[{context}] {msgid}"
         click.echo(textwrap.fill(msgid, initial_indent=" " * 5, subsequent_indent=" " * 8))
@@ -40,7 +40,7 @@ def verify_po(path, show_path):
         click.echo(textwrap.fill(msgstr, initial_indent=" " * 8, subsequent_indent=" " * 8))
         click.echo(f"Used for {len(keys)} canonical texts:")
         for idx, info in enumerate(keys):
-            (context, msgid) = info
+            context, msgid = info
             if context:
                 msgid = f"[{context}] {msgid}"
             click.echo(

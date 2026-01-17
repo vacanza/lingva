@@ -23,7 +23,7 @@ class BabelExtractor(Extractor):
                 args = [args]
             if function in self.keywords:
                 args = [(None, a, lineno) for a in args]
-                (domain, msgctxt, msgid, msgid_plural, c) = parse_keyword(
+                domain, msgctxt, msgid, msgid_plural, c = parse_keyword(
                     args, self.keywords[function], filename, lineno
                 )
                 if c:

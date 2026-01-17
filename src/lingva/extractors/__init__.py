@@ -102,14 +102,14 @@ class Keyword:
         if ":" not in spec:
             return cls(spec)
         try:
-            (function, args) = spec.split(":", 1)
+            function, args = spec.split(":", 1)
             kw = cls(function)
             seen_msgid_param = False
             while args:
                 if cls._comment_arg.match(args) is not None:
                     kw.comment = args[1:-1]
                     break
-                (param, args) = args.split(",", 1) if "," in args else (args, "")
+                param, args = args.split(",", 1) if "," in args else (args, "")
                 if param.endswith("c"):
                     kw.msgctxt_param = int(param[:-1])
                 elif param.endswith("d"):

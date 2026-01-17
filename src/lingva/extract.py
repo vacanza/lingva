@@ -223,7 +223,7 @@ def save_catalog(catalog, filename):
             click.echo(f"No changes found - not replacing {filename}")
             return
         os.unlink(filename)
-    (fd, tmpfile) = tempfile.mkstemp(dir=os.path.dirname(filename), text=True)
+    fd, tmpfile = tempfile.mkstemp(dir=os.path.dirname(filename), text=True)
     output = open(fd, "w", encoding=catalog.encoding)
     output.write(catalog.__unicode__())
     output.close()

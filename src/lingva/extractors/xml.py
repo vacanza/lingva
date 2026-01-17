@@ -219,7 +219,7 @@ class ChameleonExtractor(Extractor, ElementProgram):
                         )
                     else:
                         try:
-                            (attr, msgid) = msgid.split()
+                            attr, msgid = msgid.split()
                         except ValueError:
                             continue
                         if attr not in plain_attrs:
