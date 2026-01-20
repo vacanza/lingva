@@ -5,7 +5,7 @@ requires = [ "setuptools>=61", "wheel" ]
 [project]
 name = "lingva"
 description = "Translation toolset"
-readme = "README.rst"
+readme = "README.md"
 keywords = [ "Babel", "gettext", "po", "translation" ]
 license = "BSD-3-Clause"
 license-files = [ "LICENSE" ]
