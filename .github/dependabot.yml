@@ -1,0 +1,40 @@
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    cooldown:
+      default-days: 21
+    directory: /
+    groups:
+      version-updates:
+        applies-to: version-updates
+        patterns:
+          - '*'
+    schedule:
+      day: wednesday
+      interval: weekly
+
+  - package-ecosystem: pre-commit
+    cooldown:
+      default-days: 21
+    directory: /
+    groups:
+      version-updates:
+        applies-to: version-updates
+        patterns:
+          - '*'
+    schedule:
+      day: wednesday
+      interval: weekly
+
+  - package-ecosystem: uv
+    cooldown:
+      default-days: 21
+    directory: /
+    groups:
+      version-updates:
+        applies-to: version-updates
+        patterns:
+          - '*'
+    schedule:
+      day: wednesday
+      interval: weekly
