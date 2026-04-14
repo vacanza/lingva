@@ -17,7 +17,6 @@ authors = [
   { name = "Wichert Akkerman", email = "wichert@wiggy.net" },
 ]
 requires-python = ">=3.10"
-
 classifiers = [
   "Intended Audience :: Developers",
   "Operating System :: OS Independent",
@@ -34,7 +33,6 @@ dependencies = [
   "click>=8,<9",
   "polib>=1.2,<2",
 ]
-
 optional-dependencies.chameleon = [
   "chameleon",
 ]
@@ -54,15 +52,12 @@ dev = [
   "pytest>=9,<10",
 ]
 
-[tool.setuptools.dynamic]
-version = { file = "VERSION" }
-
-[tool.setuptools.packages.find]
-where = [ "src" ]
+[tool.setuptools]
+dynamic.version = { file = "VERSION" }
+packages.find.where = [ "src" ]
 
 [tool.ruff]
 target-version = "py310"
-
 line-length = 99
 lint.select = [ "E4", "E5", "E7", "E9", "F", "UP", "W" ]
 lint.flake8-errmsg.max-string-length = 99
@@ -73,6 +68,6 @@ line_length = 99
 multi_line_output = 3
 profile = "black"
 
-[tool.pytest.ini_options]
-testpaths = "tests"
-norecursedirs = ".git tmp* .eggs bin build include lib share src"
+[tool.pytest]
+ini_options.testpaths = "tests"
+ini_options.norecursedirs = ".git tmp* .eggs bin build include lib share src"
