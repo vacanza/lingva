@@ -212,24 +212,6 @@ def identical(a, b):
     return a == b
 
 
-def save_catalog(catalog, filename):
-    if os.path.exists(filename):
-        old_catalog = None
-        try:
-            old_catalog = polib.pofile(filename)
-        except (OSError, UnicodeDecodeError):
-            pass
-        if old_catalog is not None and identical(catalog, old_catalog):
-            click.echo(f"No changes found - not replacing {filename}")
-            return
-        os.unlink(filename)
-    fd, tmpfile = tempfile.mkstemp(dir=os.path.dirname(filename), text=True)
-    output = open(fd, "w", encoding=catalog.encoding)
-    output.write(catalog.__unicode__())
-    output.close()
-    os.rename(tmpfile, filename)
-
-
 def _location_sort_key(msg):
     locations = [(fn, int(line)) for (fn, line) in msg.occurrences]
     locations.sort()  # Sort so first occurence is always used.
@@ -249,6 +231,7 @@ def extract(
     directory=None,
     sources=None,
     list_extractors=None,
+    quiet=False,
     output="messages.pot",
     location=True,
     linenumbers=True,
@@ -331,7 +314,21 @@ def extract(
         for entry in catalog:
             strip_linenumbers(entry)
 
-    save_catalog(catalog, output)
+    if os.path.exists(output):
+        old_catalog: POFile | None = None
+        try:
+            old_catalog = polib.pofile(output)
+        except (OSError, UnicodeDecodeError):
+            pass
+        if old_catalog is not None and identical(catalog, old_catalog):
+            if not quiet:
+                click.echo(f"No changes found - not replacing {output}")
+            return
+        os.unlink(output)
+    fd, tmpfile = tempfile.mkstemp(dir=os.path.dirname(output), text=True)
+    with open(fd, "w", encoding=catalog.encoding) as f:
+        f.write(catalog.__unicode__())
+    os.rename(tmpfile, output)
 
 
 @click.command()
@@ -361,6 +358,13 @@ def extract(
 )
 @click.argument("sources", nargs=-1, type=click.Path(exists=True))
 @click.option("--list-extractors", is_flag=True, help="List all known extraction plugins")
+@click.option(
+    "-q",
+    "--quiet",
+    "quiet",
+    default=False,
+    help="Show error messages only",
+)
 # Output options
 @click.option(
     "-o",
@@ -444,6 +448,7 @@ def main(
     directory,
     sources,
     list_extractors,
+    quiet,
     output,
     location,
     linenumbers,
@@ -465,6 +470,7 @@ def main(
         directory,
         sources,
         list_extractors,
+        quiet,
         output,
         location,
         linenumbers,
