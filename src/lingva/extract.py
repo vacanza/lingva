@@ -363,6 +363,7 @@ def extract(
     "--quiet",
     "quiet",
     default=False,
+    is_flag=True,
     help="Show error messages only",
 )
 # Output options
