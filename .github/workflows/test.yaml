@@ -4,25 +4,29 @@ on:
   - pull_request
   - push
 
+env:
+  DEFAULT_PYTHON_VERSION: '3.14'
+  DEFAULT_UV_VERSION: '0.11.24'
+
 jobs:
   pre-commit:
     name: Run pre-commit
     runs-on: ubuntu-latest
     steps:
       - name: Check out repository
-        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0  # v7.0.0
 
       - name: Install uv
-        uses: astral-sh/setup-uv@11f9893b081a58869d3b5fccaea48c9e9e46f990
+        uses: astral-sh/setup-uv@11f9893b081a58869d3b5fccaea48c9e9e46f990  # v8.3.2
         with:
-          python-version: '3.14'
-          version: '0.9.16'
+          python-version: ${{ env.DEFAULT_PYTHON_VERSION }}
+          version: ${{ env.DEFAULT_UV_VERSION }}
 
       - name: Install Python
         run: uv python install "$UV_PYTHON"
 
       - name: Run pre-commit
-        run: uv tool run --with pre-commit-uv pre-commit run --show-diff-on-failure --color=always --all-files
+        run: uv tool run --with "pre-commit-uv,uv==${DEFAULT_UV_VERSION}" pre-commit run --show-diff-on-failure --color=always --all-files
 
   test:
     name: Test Python ${{ matrix.python-version }} on ${{ matrix.os }}
@@ -43,13 +47,13 @@ jobs:
           - '3.14'
     steps:
       - name: Check out repository
-        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0  # v7.0.0
 
       - name: Install uv
-        uses: astral-sh/setup-uv@11f9893b081a58869d3b5fccaea48c9e9e46f990
+        uses: astral-sh/setup-uv@11f9893b081a58869d3b5fccaea48c9e9e46f990  # v8.3.2
         with:
           python-version: ${{ matrix.python-version }}
-          version: '0.9.16'
+          version: ${{ env.DEFAULT_UV_VERSION }}
 
       - name: Install Python ${{ matrix.python-version }}
         run: uv python install ${{ matrix.python-version }}
@@ -62,7 +66,10 @@ jobs:
 
   publish:
     name: Publish to PyPI
-    if: github.event_name == 'push' && startsWith(github.event.ref, 'refs/tags/v')
+    if: |
+      github.repository == 'vacanza/lingva' &&
+      github.event_name == 'push' &&
+      startsWith(github.event.ref, 'refs/tags/v')
     runs-on: ubuntu-latest
     needs: test
     permissions:
@@ -70,13 +77,13 @@ jobs:
 
     steps:
       - name: Check out repository
-        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0  # v7.0.0
 
       - name: Install uv
-        uses: astral-sh/setup-uv@11f9893b081a58869d3b5fccaea48c9e9e46f990
+        uses: astral-sh/setup-uv@11f9893b081a58869d3b5fccaea48c9e9e46f990  # v8.3.2
         with:
-          python-version: '3.14'
-          version: '0.9.16'
+          python-version: ${{ env.DEFAULT_PYTHON_VERSION }}
+          version: ${{ env.DEFAULT_UV_VERSION }}
 
       - name: Install Python
         run: uv python install "$UV_PYTHON"
@@ -85,4 +92,4 @@ jobs:
         run: uv build
 
       - name: Publish to PyPI
-        uses: pypa/gh-action-pypi-publish@release/v1
+        uses: pypa/gh-action-pypi-publish@cef221092ed1bacb1cc03d23a2d87d1d172e277b  # v1.14.0
