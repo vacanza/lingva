@@ -114,8 +114,8 @@ lingva will always include messages for which it can not determine the domain.
 For example, take this Python code:
 
 ```python
-print(gettext('Hello, World'))
-print(dgettext('mydomain', 'Bye bye'))
+print(gettext("Hello, World"))
+print(dgettext("mydomain", "Bye bye"))
 ```
 
 The first hello-message does not specify its domain and will always be
@@ -148,14 +148,14 @@ translation call.
 
 ```python
 # This text should address the user directly.
-return _('Thank you for using our service.')
+return _("Thank you for using our service.")
 ```
 
 Alternatively you can also put a comment at the end of the line starting your
 translation function call.
 
 ```python
-return _('Thank you for using our service.')  # Address the user directly
+return _("Thank you for using our service.")  # Address the user directly
 ```
 
 If you do not want all comments to be included but only specific ones you can
@@ -163,7 +163,7 @@ add a keyword to the `--add-comments` option, for example `--add-comments=I18N`.
 
 ```python
 # I18N This text should address the user directly, and use formal addressing.
-return _('Thank you for using our service')
+return _("Thank you for using our service")
 ```
 
 ## Setting message flags in comments
@@ -302,12 +302,14 @@ First we need to create the custom extractor
 from lingva.extractors import Extractor
 from lingva.extractors import Message
 
+
 class MyExtractor(Extractor):
-    '''One-line description for --list-extractors'''
-    extensions = ['.txt']
+    """One-line description for --list-extractors"""
+
+    extensions = [".txt"]
 
     def __call__(self, filename, options):
-        return [Message(None, 'msgid', None, [], '', '', (filename, 1))]
+        return [Message(None, "msgid", None, [], "", "", (filename, 1))]
 ```
 
 Hooking up extractors to lingva is done by `lingva.extractors` entry points
