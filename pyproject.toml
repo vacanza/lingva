@@ -49,7 +49,9 @@ entry-points."lingva.extractors".zope = "lingva.extractors.xml:ZopeExtractor"
 [dependency-groups]
 dev = [
   "pre-commit>=4.5,<5",
+  "pre-commit-uv>=4.3,<5",
   "pytest>=9,<10",
+  "uv==0.12.9",
 ]
 
 [tool.setuptools]
