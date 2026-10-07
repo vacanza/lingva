@@ -52,7 +52,7 @@ dev = [
   "pre-commit>=4.5,<5",
   "pre-commit-uv>=4.3,<5",
   "pytest>=9,<10",
-  "uv==0.12.12",
+  "uv==0.12.15",
 ]
 
 [tool.setuptools]
