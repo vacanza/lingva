@@ -16,12 +16,11 @@ maintainers = [
 authors = [
   { name = "Wichert Akkerman", email = "wichert@wiggy.net" },
 ]
-requires-python = ">=3.10"
+requires-python = ">=3.11"
 classifiers = [
   "Intended Audience :: Developers",
   "Operating System :: OS Independent",
   "Programming Language :: Python :: 3 :: Only",
-  "Programming Language :: Python :: 3.10",
   "Programming Language :: Python :: 3.11",
   "Programming Language :: Python :: 3.12",
   "Programming Language :: Python :: 3.13",
@@ -60,7 +59,7 @@ packages.find.where = [ "src" ]
 dynamic.version = { file = "VERSION" }
 
 [tool.ruff]
-target-version = "py310"
+target-version = "py311"
 line-length = 99
 lint.select = [ "E4", "E5", "E7", "E9", "F", "UP", "W" ]
 lint.flake8-errmsg.max-string-length = 99
