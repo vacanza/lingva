@@ -1,6 +1,6 @@
 import polib
 
-from lingva.extract import POEntry, POFile, identical, read_config, strip_linenumbers
+from lingva.extract import POEntry, POFile, extract, identical, read_config, strip_linenumbers
 from lingva.extractors import EXTENSIONS, register_extractors
 
 STRIPPED_LINENUMBERS_PO = """\
@@ -72,3 +72,13 @@ class Test_identical:
         register_extractors()
         read_config(open("tests/data/test_config.cfg"))
         assert EXTENSIONS[".html"] == "xml"
+
+
+def test_keyword_only_translationstring_extraction(tmp_path):
+    source = tmp_path / "messages.py"
+    source.write_text('_(msgid="hello", default="Hello there", context="button")\n')
+    output = tmp_path / "messages.pot"
+    extract(sources=[str(source)], output=str(output), keywords=[])
+    entry = polib.pofile(str(output)).find("hello", msgctxt="button")
+    assert entry is not None
+    assert entry.comment == "Default: Hello there"
