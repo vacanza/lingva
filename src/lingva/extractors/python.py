@@ -72,7 +72,7 @@ def parse_translationstring(arguments, filename, firstline):
     args = [a[1] for a in arguments if a[0] is None]
     kwargs = dict((a[0], a[1]) for a in arguments if a[0] is not None)
 
-    if isinstance(args[0], str):
+    if args and isinstance(args[0], str):
         msgid = args[0]
     if len(args) > 2 and isinstance(args[2], str):
         default = args[2]
