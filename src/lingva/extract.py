@@ -115,9 +115,9 @@ def list_files(files_from, sources):
 def find_file(filename, search_path=None):
     """Return the filename for a given file, checking search paths."""
     for path in (os.path.curdir, *(search_path or ())):
-        filename = os.path.join(path, filename)
-        if os.path.isfile(filename):
-            return filename
+        candidate = os.path.join(path, filename)
+        if os.path.isfile(candidate):
+            return candidate
     return None
 
 
