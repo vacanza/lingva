@@ -66,6 +66,30 @@ def test_translationstring_parameters():
     assert messages[0].comment == "Default: Canonical text"
 
 
+@pytest.mark.parametrize(
+    "source_text, expected",
+    [
+        ('_(msgid="hello")', ("hello", None, "")),
+        (
+            '_(msgid="hello", default="Hello there", context="button")',
+            ("hello", "button", "Default: Hello there"),
+        ),
+        ('_(default="No message id")', None),
+        ("_(msgid=dynamic_value)", None),
+    ],
+)
+def test_translationstring_keyword_only(source_text, expected):
+    options = mock.Mock()
+    options.keywords = []
+    options.comment_tag = None
+    messages = list(python_extractor("filename", options, fileobj=io.StringIO(source_text)))
+    if expected is None:
+        assert messages == []
+    else:
+        assert len(messages) == 1
+        assert (messages[0].msgid, messages[0].msgctxt, messages[0].comment) == expected
+
+
 @pytest.mark.usefixtures("fake_source")
 def test_translationstring_context():
     global source
