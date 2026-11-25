@@ -1,6 +1,16 @@
+import os
+
 import polib
 
-from lingva.extract import POEntry, POFile, identical, read_config, strip_linenumbers
+from lingva.extract import (
+    POEntry,
+    POFile,
+    extract,
+    find_file,
+    identical,
+    read_config,
+    strip_linenumbers,
+)
 from lingva.extractors import EXTENSIONS, register_extractors
 
 STRIPPED_LINENUMBERS_PO = """\
@@ -72,3 +82,41 @@ class Test_identical:
         register_extractors()
         read_config(open("tests/data/test_config.cfg"))
         assert EXTENSIONS[".html"] == "xml"
+
+
+class TestFindFile:
+    def test_multiple_relative_search_paths(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        (tmp_path / "first").mkdir()
+        (tmp_path / "second").mkdir()
+        source = tmp_path / "second" / "messages.py"
+        source.write_text('_("hello")\n')
+        assert find_file("messages.py", ["first", "second"]) == os.path.join(
+            "second", "messages.py"
+        )
+
+    def test_current_directory_takes_precedence(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        (tmp_path / "messages.py").write_text('_("local")\n')
+        (tmp_path / "other").mkdir()
+        (tmp_path / "other" / "messages.py").write_text('_("other")\n')
+        assert find_file("messages.py", ["other"]) == os.path.join(".", "messages.py")
+
+    def test_missing_file(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        assert find_file("missing.py", ["first", "second"]) is None
+
+    def test_files_from_with_multiple_directories(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        (tmp_path / "first").mkdir()
+        (tmp_path / "second").mkdir()
+        (tmp_path / "second" / "messages.py").write_text('_("hello")\n')
+        output = tmp_path / "messages.pot"
+        extract(
+            files_from=["messages.py\n"],
+            sources=[],
+            directory=["first", "second"],
+            output=str(output),
+            keywords=[],
+        )
+        assert polib.pofile(str(output)).find("hello") is not None
